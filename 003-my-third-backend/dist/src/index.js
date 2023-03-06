@@ -1,5 +1,23 @@
 "use strict";
 /*
+Что нужно для работы:
+
+npm install --global yarn
+yarn init
+yarn add express
+yarn add nodemon -D
+yarn add typescript ts-node @types/express @types/node -D
+yarn tsc --init
+yarn add -D jest ts-jest @types/jest supertest @types/supertest
+yarn ts-jest config:init
+прочитать следующий комментарий
+*/
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HTTP_STATUSES = exports.app = void 0;
+/*
 Установка "yarn" (после его установки, лучше не использоват одновременно с npm): npm install --global yarn
 Файл "package.json" с точки зрения Node.js эта файл является определяющей какой-либо проект.
 Чтобы этот файл появился нужно написать: yarn init
@@ -8,7 +26,7 @@
 Чтобы установить фреймворк "Express" нужно ввести: yarn add express
 
 "nodemon" это программа-пакет, которая отслеживает изменение файлов и автоматически меняет сервер в браузере без
-необходимости его постоянно перезапускать. Такой пакет лучше устанавливать локально и для разработки, то указывая
+необходимости его постоянно перезапускать. Такой пакет лучше устанавливать локально и для разработки, то есть указывая
 "--save-dev" для npm или "-D" для yarn. Для его установки нужно ввести: yarn add nodemon -D
 Чтобы локально запустить nodemon нужно ввести: yarn nodemon имя_файла
 
@@ -43,11 +61,6 @@ yarn add typescript ts-node @types/express @types/node -D
 yarn ts-jest config:init
 Для запуска тестирования нужна команда jest, которую также можно указать в скриптах в в файле "package.json".
 */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.HTTP_STATUSES = exports.app = void 0;
 /*Подключаем Express. В целях типизации импортируем Response из Express.*/
 const express_1 = __importDefault(require("express"));
 exports.app = (0, express_1.default)(); /*Импортировали, чтобы использовать для тестов.*/

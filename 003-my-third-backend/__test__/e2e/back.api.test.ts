@@ -1,9 +1,11 @@
 /*Импортируем библиотеку "request", которая позволяет делать запросы к серверу. supertest сам поднимет нащ сервер во
 время тестирования.*/
 import request from 'supertest';
-import {app, HTTP_STATUSES} from '../../src';
 import {CreateBookModel} from '../../src/models/CreateBookModel';
 import {UpdateBookModel} from '../../src/models/UpdateBookModel';
+import {app} from '../../src/app';
+import {HTTP_STATUSES} from '../../src/routes/books';
+
 
 describe('/page-one', () => {
     /*Метод "beforeAll()" позволяет запустить какой-то код перед выполнением всех тестов.*/
@@ -49,7 +51,7 @@ describe('/page-one', () => {
 
     it('should create a book with correct input data', async () => {
         const data: CreateBookModel = {title: 'book-five'};
-        
+
         /*Запрос вернет ответ, который мы сохраняем в отдельную переменную.*/
         const createdResponse = await request(app)
             .post('/page-one')
