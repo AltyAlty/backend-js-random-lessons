@@ -3,9 +3,8 @@
 import request from 'supertest';
 import {CreateBookModel} from '../../src/models/CreateBookModel';
 import {UpdateBookModel} from '../../src/models/UpdateBookModel';
+import {HTTP_STATUSES} from '../../src/utils';
 import {app} from '../../src/app';
-import {HTTP_STATUSES} from '../../src/routes/books';
-
 
 describe('/page-one', () => {
     /*Метод "beforeAll()" позволяет запустить какой-то код перед выполнением всех тестов.*/

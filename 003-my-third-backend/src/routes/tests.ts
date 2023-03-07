@@ -1,12 +1,16 @@
-import {Express} from 'express';
+import express from 'express';
+import {HTTP_STATUSES} from '../utils';
+/*Импортируем ДБ.*/
 import {DBType} from '../db/db';
-import {HTTP_STATUSES} from './books';
 
+export const getTestsRouter = (db: DBType) => {
+    const router = express.Router();
 
-export const addTestsRoutes = (app: Express, db: DBType) => {
-    app.delete('/__test__/data', (req, res) => {
+    router.delete('/data', (req, res) => {
         db.books = [];
 
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
     });
+
+    return router;
 };
