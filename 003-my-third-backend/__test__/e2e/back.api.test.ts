@@ -1,4 +1,4 @@
-/*Импортируем библиотеку "request", которая позволяет делать запросы к серверу. supertest сам поднимет нащ сервер во
+/*Импортируем библиотеку "request", которая позволяет делать запросы к серверу. supertest сам поднимет наш сервер во
 время тестирования.*/
 import request from 'supertest';
 import {CreateBookModel} from '../../src/models/CreateBookModel';

@@ -1,4 +1,4 @@
-/*Создаем тип для входящей модели (Input Model) для создания книги.*/
+/*Тип для входящей модели (Input Model) для создания книги.*/
 export type CreateBookModel = {
     /*
      * title of a new book

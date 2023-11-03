@@ -44,7 +44,7 @@ yarn add typescript ts-node @types/express @types/node -D
 Чтобы запускать сразу две эти команды, то в файл "package.json" перед разделом "dependencies" нужно добавить:
 "scripts": {
     "watch": "tsc -w",
-    "dev": "nodemon .\\dist\\index.js"
+    "dev": "nodemon .\\dist\\src\\index.js"
   },
 Теперь либо можно запускать эти команды прямо из этого файла, либо нажать ПКМ на него и выбрать "Show npm Scripts",
 чтобы можно было запускать эти команды в отдельном окне.
