@@ -3,9 +3,9 @@ import express from 'express';
 /*Импортируем ДБ.*/
 import {db} from './db/db';
 /*Импортируем роутеры нашего приложения.*/
-import {getBooksRouter, getInterestingRouter} from './routes/books';
-import {getTestsRouter} from './routes/tests';
-import {getMainPageRouter} from './routes/mainpage';
+import {getBooksRouter, getInterestingRouter} from './routes/books-routes';
+import {getTestsRouter} from './routes/tests-routes';
+import {getMainPageRouter} from './routes/mainpage-routes';
 
 /*Создаем приложение на Express.*/
 export const app = express();
@@ -21,5 +21,5 @@ app.use(jsonBodyMiddleware);
 роутеры будут дописывать какие-то подпути в зависимости от их конфигурации.*/
 app.use('/page-one', getBooksRouter(db));
 app.use('/__test__', getTestsRouter(db));
-app.use('/', getMainPageRouter());
+app.use('/', getMainPageRouter(db));
 app.use('/interesting', getInterestingRouter());

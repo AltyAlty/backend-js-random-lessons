@@ -62,7 +62,8 @@ yarn ts-jest config:init
 запуск прослушивания порта.*/
 import {app} from './app';
 
-const port = 3000;
+/*Делаем так, чтобы порт определялся автоматически от окружения.*/
+const port = process.env.PORT || 3000;
 
 /*Устанавлиаем какой порт прослушивается.*/
 app.listen(port, () => {

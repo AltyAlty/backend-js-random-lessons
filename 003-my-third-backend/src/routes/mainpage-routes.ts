@@ -1,12 +1,14 @@
-import express from 'express';
+import express, {Request, Response} from 'express';
+import {DBType} from '../db/db';
+import {mainPageRepository} from '../repositories/mainpage-repository';
 
-export const getMainPageRouter = () => {
+export const getMainPageRouter = (db: DBType) => {
     const router = express.Router();
 
     /*Если будет запрос по адресу '/', то запустится указанная callback-функция. Метод "send()" это аналог "write()"
     из библиотеки "http". Этот метод в зависимости от передаваемых данных сам меняет заголовок "Content-Type" в ответе.
     Если передать число, то оно будет интерпретировано как код ответа от сервера.*/
-    router.get('/', (req, res) => {
+    router.get('/', (req: Request, res: Response) => {
         /*
         В консоли можно использовать такую команду:
         fetch('http://localhost:3000/', {method: 'GET'})
@@ -17,7 +19,8 @@ export const getMainPageRouter = () => {
         /*Передаем объект, чтобы можно было работать с форматом JSON.*/
         // res.send({message: 'Hello!'});
         // res.send('Hello!');
-        res.send('<h1>Hello!</h1>');
+        const mainPageContent = mainPageRepository.getMainPageContent(db);
+        res.send(mainPageContent);
         // res.send(404);
 
         /*Для передачи JSON-данных можно использовать метод "json()". Этот метод преобразовывать данные в JSON сам.*/

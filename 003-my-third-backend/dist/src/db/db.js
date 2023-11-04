@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.db = void 0;
 exports.db = {
+    mainPageContent: '<h1>Hello!</h1>',
     books: [
         { id: 1, title: 'book-one', customersCount: 5 },
         { id: 2, title: 'book-two', customersCount: 6 },
