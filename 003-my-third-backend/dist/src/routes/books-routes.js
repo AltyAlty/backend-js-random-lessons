@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getInterestingRouter = exports.getBooksRouter = void 0;
+exports.getAuthorsRouter = exports.requestCounterMiddleware = exports.authGuardMiddleware = exports.uselessMiddleware = exports.getInterestingRouter = exports.getBooksRouter = void 0;
 /*В целях типизации импортируем Response из Express.*/
 const express_1 = __importDefault(require("express"));
 const utils_1 = require("../utils");
@@ -139,3 +139,46 @@ const getInterestingRouter = () => {
     return router;
 };
 exports.getInterestingRouter = getInterestingRouter;
+/*Создаем свой middleware, который предоставляет дополнительные данные.*/
+const uselessMiddleware = (req, res, next) => {
+    // @ts-ignore
+    req.someInfo = 'Ok';
+    next(); // Этот метод нужен для работы цепочки handler-функций.
+};
+exports.uselessMiddleware = uselessMiddleware;
+/*Создаем свой middleware, который имитирует проверку на логинизацию, чтобы ее пройти нужно использовать query-параметр
+?token=123*/
+const authGuardMiddleware = (req, res, next) => {
+    if (req.query.token === '123') {
+        next();
+    }
+    else {
+        res.sendStatus(utils_1.HTTP_STATUSES.UNAUTHORIZED_401);
+    }
+};
+exports.authGuardMiddleware = authGuardMiddleware;
+let requestCounter = 0;
+/*Создаем свой middleware, который считает количество запросов.*/
+const requestCounterMiddleware = (req, res, next) => {
+    requestCounter++;
+    next();
+};
+exports.requestCounterMiddleware = requestCounterMiddleware;
+const getAuthorsRouter = () => {
+    const router = express_1.default.Router();
+    /*Можно задавать больше одной handler-функции, тем самым реализуя middleware.*/
+    // router.get('/', uselessMiddleware, (req: Request, res: Response) => {
+    //         // @ts-ignore
+    //         const someInfo = req.someInfo;
+    //         res.json({someInfo: someInfo + ` let's go`});
+    //     }
+    // );
+    /*Также можно указать свой middleware в "app.use()".*/
+    router.get('/', (req, res) => {
+        // @ts-ignore
+        const someInfo = req.someInfo;
+        res.json({ someInfo: someInfo + ` let's go` + ` requests: ` + requestCounter });
+    });
+    return router;
+};
+exports.getAuthorsRouter = getAuthorsRouter;

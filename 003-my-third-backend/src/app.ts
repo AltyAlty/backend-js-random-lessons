@@ -3,7 +3,13 @@ import express from 'express';
 /*Импортируем ДБ.*/
 import {db} from './db/db';
 /*Импортируем роутеры нашего приложения.*/
-import {getBooksRouter, getInterestingRouter} from './routes/books-routes';
+import {
+    authGuardMiddleware,
+    getAuthorsRouter,
+    getBooksRouter,
+    getInterestingRouter, requestCounterMiddleware,
+    uselessMiddleware
+} from './routes/books-routes';
 import {getTestsRouter} from './routes/tests-routes';
 import {getMainPageRouter} from './routes/mainpage-routes';
 
@@ -17,9 +23,15 @@ export const app = express();
 export const jsonBodyMiddleware = express.json();
 app.use(jsonBodyMiddleware);
 
+/*Подключаем наши собственные middleware. Порядок middleware важен.*/
+app.use(requestCounterMiddleware);
+app.use(uselessMiddleware);
+app.use(authGuardMiddleware);
+
 /*Подключаем к нашему приложению на Express роутеры. Здесь нужно указать какой-то корневой путь адреса, к которому
-роутеры будут дописывать какие-то подпути в зависимости от их конфигурации.*/
+роутеры будут дописывать какие-то подпути в за висимости от их конфигурации.*/
 app.use('/page-one', getBooksRouter(db));
 app.use('/__test__', getTestsRouter(db));
 app.use('/', getMainPageRouter(db));
 app.use('/interesting', getInterestingRouter());
+app.use('/authors', getAuthorsRouter());

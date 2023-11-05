@@ -20,9 +20,14 @@ exports.app = (0, express_1.default)();
 массив битов, это называется сериализация (строковая или бинарная соотвественно).*/
 exports.jsonBodyMiddleware = express_1.default.json();
 exports.app.use(exports.jsonBodyMiddleware);
+/*Подключаем наши собственные middleware. Порядок middleware важен.*/
+exports.app.use(books_routes_1.requestCounterMiddleware);
+exports.app.use(books_routes_1.uselessMiddleware);
+exports.app.use(books_routes_1.authGuardMiddleware);
 /*Подключаем к нашему приложению на Express роутеры. Здесь нужно указать какой-то корневой путь адреса, к которому
-роутеры будут дописывать какие-то подпути в зависимости от их конфигурации.*/
+роутеры будут дописывать какие-то подпути в за висимости от их конфигурации.*/
 exports.app.use('/page-one', (0, books_routes_1.getBooksRouter)(db_1.db));
 exports.app.use('/__test__', (0, tests_routes_1.getTestsRouter)(db_1.db));
 exports.app.use('/', (0, mainpage_routes_1.getMainPageRouter)(db_1.db));
 exports.app.use('/interesting', (0, books_routes_1.getInterestingRouter)());
+exports.app.use('/authors', (0, books_routes_1.getAuthorsRouter)());
