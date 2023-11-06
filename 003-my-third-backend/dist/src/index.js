@@ -10,6 +10,7 @@ yarn add typescript ts-node @types/express @types/node -D
 yarn tsc --init
 yarn add -D jest ts-jest @types/jest supertest @types/supertest
 yarn ts-jest config:init
+yarn add express-validator
 прочитать следующий комментарий
 */
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -57,6 +58,9 @@ yarn add typescript ts-node @types/express @types/node -D
 Далее для работы jest нужен базовый файл конфигурации "jest.config.js". Для этого нужно ввести:
 yarn ts-jest config:init
 Для запуска тестирования нужна команда jest, которую также можно указать в скриптах в в файле "package.json".
+
+"express-validator" это набор промежуточных слоев для Express, в который входит обширная коллекция валидаторов и
+дезинфицирующих средств, предлагаемых "validator.js". Для установки нужно ввести: yarn add express-validator
 */
 /*Этот файл "index.ts" служит главной точкой входа в приложении, поэтому здесь просто подключается "app" и происходит
 запуск прослушивания порта.*/

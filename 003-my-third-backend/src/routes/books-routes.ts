@@ -10,8 +10,13 @@ import {UpdateURIParamsIDBookModel} from '../models/UpdateURIParamsIDBookModel';
 import {UpdateBookModel} from '../models/UpdateBookModel';
 import {HTTP_STATUSES} from '../utils';
 /*Импортируем ДБ.*/
-import {BookType, DBType} from '../db/db';
+import {DBType} from '../db/db';
 import {booksRepository} from '../repositories/books-repository';
+import {
+    titleIsNotEmptyValidationMiddleware,
+    titleIsOfCorrectLengthValidationMiddleware, titleValidationMiddleware
+} from '../middlewares/books-middlewares';
+
 
 export const getBooksRouter = (db: DBType) => {
     /*Используем роутинг, который предоставляется в Express. Создаем роутер, которые далее конфигурируем, то есть
@@ -64,34 +69,32 @@ export const getBooksRouter = (db: DBType) => {
     });
 
     /*C - Create*/
-    router.post('/', (req: RequestWithBody<CreateBookModel>, res: Response<BookViewModel>) => {
-        if (!req.body.title) {
-            res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
-            return;
-        }
+    router.post('/',
+        titleIsNotEmptyValidationMiddleware,
+        titleIsOfCorrectLengthValidationMiddleware,
+        titleValidationMiddleware,
+        (req: RequestWithBody<CreateBookModel>, res: Response<BookViewModel>) => {
+            const createdBook = booksRepository.createBookWithTitle(req.body.title, db);
 
-        const createdBook = booksRepository.createBookWithTitle(req.body.title, db);
+            /*При помощи метода "status()" уставливаем код ответа сервера при помощи чейнинга.*/
+            res
+                .status(HTTP_STATUSES.CREATED_201)
+                .json(createdBook);
+            // res.status(201);
+            // res.json(createdBook);
 
-        /*При помощи метода "status()" уставливаем код ответа сервера при помощи чейнинга.*/
-        res
-            .status(HTTP_STATUSES.CREATED_201)
-            .json(createdBook);
-        // res.status(201);
-        // res.json(createdBook);
-
-        /*В консоли можно использовать такую команду:
-        fetch('http://localhost:3000/page-one', {method: 'POST', body: JSON.stringify({title: 'book-five'}),
-        headers: {
-            'content-type': 'application/json'
-        }})
-            .then(res => res.json())
-            .then(json => console.log(json))
-        */
-    });
+            /*В консоли можно использовать такую команду:
+            fetch('http://localhost:3000/page-one', {method: 'POST', body: JSON.stringify({title: 'book-five'}),
+            headers: {
+                'content-type': 'application/json'
+            }})
+                .then(res => res.json())
+                .then(json => console.log(json))
+            */
+        });
 
     /*D - Delete*/
-    router.delete('/:id', (req: RequestWithParams<DeleteURIParamsIDBookModel>,
-                           res) => {
+    router.delete('/:id', (req: RequestWithParams<DeleteURIParamsIDBookModel>, res: Response) => {
         booksRepository.deleteBookByID(req.params.id, db);
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 
@@ -108,36 +111,35 @@ export const getBooksRouter = (db: DBType) => {
     });
 
     /*U - Update*/
-    router.put('/:id', (req: RequestWithParamsAndBody<UpdateURIParamsIDBookModel, UpdateBookModel>,
-                        res) => {
-        if (!req.body.title) {
-            res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
-            return;
-        }
+    router.put('/:id',
+        titleIsNotEmptyValidationMiddleware,
+        titleIsOfCorrectLengthValidationMiddleware,
+        titleValidationMiddleware,
+        (req: RequestWithParamsAndBody<UpdateURIParamsIDBookModel, UpdateBookModel>,
+         res: Response) => {
+            const foundBook = booksRepository.updateBookTitleByID(req.body.title, req.params.id, db);
 
-        const foundBook = booksRepository.updateBookTitleByID(req.body.title, req.params.id, db);
+            if (!foundBook) {
+                res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+                return;
+            }
 
-        if (!foundBook) {
-            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
-            return;
-        }
+            res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+            /*В консоли можно использовать такую команду:
+            fetch('http://localhost:3000/page-one/3', {method: 'PUT', body: JSON.stringify({title: 'book-one-one'}),
+                headers: {
+                    'content-type': 'application/json'
+                }})
+                    .then(res => res.json())
+                    .then(json => console.log(json))
 
-        /*В консоли можно использовать такую команду:
-        fetch('http://localhost:3000/page-one/3', {method: 'PUT', body: JSON.stringify({title: 'book-one-one'}),
-            headers: {
-                'content-type': 'application/json'
-            }})
+            Для проверки изменения можно использовать такую команду:
+            fetch('http://localhost:3000/page-one', {method: 'GET'})
                 .then(res => res.json())
                 .then(json => console.log(json))
-
-        Для проверки изменения можно использовать такую команду:
-        fetch('http://localhost:3000/page-one', {method: 'GET'})
-            .then(res => res.json())
-            .then(json => console.log(json))
-        */
-    });
+            */
+        });
 
     return router;
 };

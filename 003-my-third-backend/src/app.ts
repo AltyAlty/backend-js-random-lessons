@@ -26,7 +26,7 @@ app.use(jsonBodyMiddleware);
 /*Подключаем наши собственные middleware. Порядок middleware важен.*/
 app.use(requestCounterMiddleware);
 app.use(uselessMiddleware);
-app.use(authGuardMiddleware);
+// app.use(authGuardMiddleware);
 
 /*Подключаем к нашему приложению на Express роутеры. Здесь нужно указать какой-то корневой путь адреса, к которому
 роутеры будут дописывать какие-то подпути в за висимости от их конфигурации.*/

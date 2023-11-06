@@ -23,7 +23,7 @@ exports.app.use(exports.jsonBodyMiddleware);
 /*Подключаем наши собственные middleware. Порядок middleware важен.*/
 exports.app.use(books_routes_1.requestCounterMiddleware);
 exports.app.use(books_routes_1.uselessMiddleware);
-exports.app.use(books_routes_1.authGuardMiddleware);
+// app.use(authGuardMiddleware);
 /*Подключаем к нашему приложению на Express роутеры. Здесь нужно указать какой-то корневой путь адреса, к которому
 роутеры будут дописывать какие-то подпути в за висимости от их конфигурации.*/
 exports.app.use('/page-one', (0, books_routes_1.getBooksRouter)(db_1.db));

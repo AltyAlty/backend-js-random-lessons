@@ -8,6 +8,7 @@ exports.getAuthorsRouter = exports.requestCounterMiddleware = exports.authGuardM
 const express_1 = __importDefault(require("express"));
 const utils_1 = require("../utils");
 const books_repository_1 = require("../repositories/books-repository");
+const books_middlewares_1 = require("../middlewares/books-middlewares");
 const getBooksRouter = (db) => {
     /*Используем роутинг, который предоставляется в Express. Создаем роутер, которые далее конфигурируем, то есть
     описываем различные запросы, которые этот роутер должен будет обрабатывать. В конце возвращаем этот роутер,
@@ -52,11 +53,7 @@ const getBooksRouter = (db) => {
         */
     });
     /*C - Create*/
-    router.post('/', (req, res) => {
-        if (!req.body.title) {
-            res.sendStatus(utils_1.HTTP_STATUSES.BAD_REQUEST_400);
-            return;
-        }
+    router.post('/', books_middlewares_1.titleIsNotEmptyValidationMiddleware, books_middlewares_1.titleIsOfCorrectLengthValidationMiddleware, books_middlewares_1.titleValidationMiddleware, (req, res) => {
         const createdBook = books_repository_1.booksRepository.createBookWithTitle(req.body.title, db);
         /*При помощи метода "status()" уставливаем код ответа сервера при помощи чейнинга.*/
         res
@@ -89,11 +86,7 @@ const getBooksRouter = (db) => {
         */
     });
     /*U - Update*/
-    router.put('/:id', (req, res) => {
-        if (!req.body.title) {
-            res.sendStatus(utils_1.HTTP_STATUSES.BAD_REQUEST_400);
-            return;
-        }
+    router.put('/:id', books_middlewares_1.titleIsNotEmptyValidationMiddleware, books_middlewares_1.titleIsOfCorrectLengthValidationMiddleware, books_middlewares_1.titleValidationMiddleware, (req, res) => {
         const foundBook = books_repository_1.booksRepository.updateBookTitleByID(req.body.title, req.params.id, db);
         if (!foundBook) {
             res.sendStatus(utils_1.HTTP_STATUSES.NOT_FOUND_404);
