@@ -8,7 +8,7 @@ export const titleIsNotEmptyValidationMiddleware = body('title')
     .not().isEmpty({ignore_whitespace: true}).withMessage('title must not be empty');
 
 export const titleIsOfCorrectLengthValidationMiddleware = body('title')
-    .isLength({min: 3, max: 10}).withMessage('title must be min: 3, max: 10');
+    .isLength({min: 3, max: 20}).withMessage('title must be min: 3, max: 20');
 
 export const titleValidationMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);

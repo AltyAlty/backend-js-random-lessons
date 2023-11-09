@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -25,20 +34,35 @@ const getBooksRouter = (db) => {
 
     Далее типизируем res. Там можно типизировать Response Body, то есть можно типизировать то, что должно вернуться в
     ответе на запрос.*/
-    router.get('/', (req, res) => {
+    router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
-        const foundBooks = books_repository_1.booksRepository.findBooksByTitle((_a = req.query.title) === null || _a === void 0 ? void 0 : _a.toString(), db);
+        /*Используем "await", чтобы дождаться, когда зарезольвиться промис, чтобы получить найденные книги. Для
+        этого нашу функцию сделали асинхронной при помощи "async".*/
+        const foundBooks = yield books_repository_1.booksRepository.findBooksByTitle((_a = req.query.title) === null || _a === void 0 ? void 0 : _a.toString(), db);
+        /*"performance.now()" это метод из Node.js, который возвращает текущую метку времени в миллисекундах, где 0
+        представляет начало текущего процесса Node.js. Имитируем задержку в 3 секунды. Если после этого запроса,
+        сразу сделать какой-то другой запрос, то оба запроса будут ждать эту задержку в 3 секунды.*/
+        // let start = performance.now();
+        // console.log(start);
+        // while (performance.now() - start < 3000) {
+        //     console.log(performance.now() - start);
+        // }
+        /*Здесь же поскольку метод "setInterval()" работает асинхронно, то 3-х секундная задержка повлияет только
+        на этот запрос.*/
+        // setInterval(() => {
+        //     res.json(foundBooks);
+        // }, 3000);
         res.json(foundBooks);
         /*В консоли можно использовать такую команду:
         fetch('http://localhost:3000/page-one?title=two', {method: 'GET'})
             .then(res => res.json())
             .then(json => console.log(json))
         */
-    });
+    }));
     /*Здесь при типизации req нас интересует только первое, то есть URI-параметры, поэтому остальное можно не указывать.
     Нужно помнить, что хоть наш id является цифрой, сами URI-параметры являются строками.*/
-    router.get('/:id', (req, res) => {
-        const foundBook = books_repository_1.booksRepository.findBookByID(req.params.id, db);
+    router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const foundBook = yield books_repository_1.booksRepository.findBookByID(req.params.id, db);
         /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
         в которой отправляем код сервера и выходим из функции.*/
         if (!foundBook) {
@@ -51,10 +75,10 @@ const getBooksRouter = (db) => {
             .then(res => res.json())
             .then(json => console.log(json))
         */
-    });
+    }));
     /*C - Create*/
-    router.post('/', books_middlewares_1.titleIsNotEmptyValidationMiddleware, books_middlewares_1.titleIsOfCorrectLengthValidationMiddleware, books_middlewares_1.titleValidationMiddleware, (req, res) => {
-        const createdBook = books_repository_1.booksRepository.createBookWithTitle(req.body.title, db);
+    router.post('/', books_middlewares_1.titleIsNotEmptyValidationMiddleware, books_middlewares_1.titleIsOfCorrectLengthValidationMiddleware, books_middlewares_1.titleValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const createdBook = yield books_repository_1.booksRepository.createBookWithTitle(req.body.title, db);
         /*При помощи метода "status()" уставливаем код ответа сервера при помощи чейнинга.*/
         res
             .status(utils_1.HTTP_STATUSES.CREATED_201)
@@ -69,10 +93,10 @@ const getBooksRouter = (db) => {
             .then(res => res.json())
             .then(json => console.log(json))
         */
-    });
+    }));
     /*D - Delete*/
-    router.delete('/:id', (req, res) => {
-        books_repository_1.booksRepository.deleteBookByID(req.params.id, db);
+    router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        yield books_repository_1.booksRepository.deleteBookByID(req.params.id, db);
         res.sendStatus(utils_1.HTTP_STATUSES.NO_CONTENT_204);
         /*В консоли можно использовать такую команду:
         fetch('http://localhost:3000/page-one/1', {method: 'DELETE'})
@@ -84,10 +108,10 @@ const getBooksRouter = (db) => {
             .then(res => res.json())
             .then(json => console.log(json))
         */
-    });
+    }));
     /*U - Update*/
-    router.put('/:id', books_middlewares_1.titleIsNotEmptyValidationMiddleware, books_middlewares_1.titleIsOfCorrectLengthValidationMiddleware, books_middlewares_1.titleValidationMiddleware, (req, res) => {
-        const foundBook = books_repository_1.booksRepository.updateBookTitleByID(req.body.title, req.params.id, db);
+    router.put('/:id', books_middlewares_1.titleIsNotEmptyValidationMiddleware, books_middlewares_1.titleIsOfCorrectLengthValidationMiddleware, books_middlewares_1.titleValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const foundBook = yield books_repository_1.booksRepository.updateBookTitleByID(req.body.title, req.params.id, db);
         if (!foundBook) {
             res.sendStatus(utils_1.HTTP_STATUSES.NOT_FOUND_404);
             return;
@@ -106,7 +130,7 @@ const getBooksRouter = (db) => {
             .then(res => res.json())
             .then(json => console.log(json))
         */
-    });
+    }));
     return router;
 };
 exports.getBooksRouter = getBooksRouter;

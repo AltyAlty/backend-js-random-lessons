@@ -16,8 +16,9 @@ const mapDBBookToViewModel = (book: BookType): BookViewModel => {
 };
 
 export const booksRepository = {
-    findBooksByTitle(title: string | undefined, db: DBType) {
-        let foundBooks = db.books;
+    /*Используем "async", чтобы то, что возвращается функцией, обворачивалось в промис.*/
+    async findBooksByTitle(title: string | undefined, db: DBType): Promise<BookViewModel[]> {
+        let foundBooks: BookType[] = db.books;
 
         /*Метод "filter()" создает новый массив со всеми элементами, прошедшими проверку, задаваемую в передаваемой
         функции. Метод "indexOf()" возвращает первый индекс, по которому данный элемент может быть найден в массиве или
@@ -41,14 +42,14 @@ export const booksRepository = {
         return foundBooks.map(mapDBBookToViewModel);
     },
 
-    findBookByID(id: string, db: DBType) {
+    async findBookByID(id: string, db: DBType): Promise<BookViewModel | undefined> {
         /*Используем здесь ":id", чтобы работать с URI-параметром в адресной строке. Метод "find()" возвращает значение
         первого найденного в массиве элемента, которое удовлетворяет условию переданному в callback-функции. В противном
         случае возвращается undefined. То есть здесь мы ищем такой объект в массиве "db.books", у которого свойство "id"
         совпадает с URI-параметром "id", который в свою очередь находится в "req", то есть в содержащем данные о
-        запросе, внутри свойства "params". Этот URI-параметр изначально строкой, поэтому приводим его числу при помощи
-        "+".*/
-        const foundBook = db.books.find(c => c.id === +id);
+        запросе, внутри свойства "params". Этот URI-параметр изначально является строкой, поэтому приводим его к числу
+        при помощи "+".*/
+        const foundBook: BookType | undefined = db.books.find(c => c.id === +id);
 
         /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
         в которой выходим из функции.*/
@@ -59,7 +60,7 @@ export const booksRepository = {
         return mapDBBookToViewModel(foundBook);
     },
 
-    createBookWithTitle(title: string, db: DBType) {
+    async createBookWithTitle(title: string, db: DBType): Promise<BookViewModel> {
         const newBook: BookType = {
             /*"+(new Date())" - таким образом генерируем случайно число. На самом деле генерация новых id это задача
             сервера, то есть клиент не должен их сам указывать при создании нового ресурса.*/
@@ -74,15 +75,15 @@ export const booksRepository = {
         return (mapDBBookToViewModel(newBook));
     },
 
-    deleteBookByID(id: string, db: DBType) {
+    async deleteBookByID(id: string, db: DBType): Promise<void> {
         /*Здесь мы ищем такой объект в массиве "db.books", у которого свойство "id" не совпадает с URI-параметром "id",
         и отфильтровываем его так, чтобы получился массив без этого объекта. Тем самым мы осуществляем удаление
         элемента.*/
         db.books = db.books.filter(c => c.id !== +id);
     },
 
-    updateBookTitleByID(title: string, id: string, db: DBType) {
-        const foundBook = db.books.find(c => c.id === +id);
+    async updateBookTitleByID(title: string, id: string, db: DBType): Promise<BookType | undefined> {
+        const foundBook: BookType | undefined = db.books.find(c => c.id === +id);
 
         if (!foundBook) {
             return undefined;

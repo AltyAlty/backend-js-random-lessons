@@ -10,7 +10,7 @@ import {UpdateURIParamsIDBookModel} from '../models/UpdateURIParamsIDBookModel';
 import {UpdateBookModel} from '../models/UpdateBookModel';
 import {HTTP_STATUSES} from '../utils';
 /*Импортируем ДБ.*/
-import {DBType} from '../db/db';
+import {BookType, DBType} from '../db/db';
 import {booksRepository} from '../repositories/books-repository';
 import {
     titleIsNotEmptyValidationMiddleware,
@@ -35,22 +35,43 @@ export const getBooksRouter = (db: DBType) => {
 
     Далее типизируем res. Там можно типизировать Response Body, то есть можно типизировать то, что должно вернуться в
     ответе на запрос.*/
-    router.get('/', (req: RequestWithQuery<GetQueryBooksModel>, res: Response<BookViewModel[]>) => {
-        const foundBooks = booksRepository.findBooksByTitle(req.query.title?.toString(), db);
-        res.json(foundBooks);
+    router.get('/',
+        async (req: RequestWithQuery<GetQueryBooksModel>, res: Response<BookViewModel[]>): Promise<void> => {
 
-        /*В консоли можно использовать такую команду:
-        fetch('http://localhost:3000/page-one?title=two', {method: 'GET'})
-            .then(res => res.json())
-            .then(json => console.log(json))
-        */
-    });
+            /*Используем "await", чтобы дождаться, когда зарезольвиться промис, чтобы получить найденные книги. Для
+            этого нашу функцию сделали асинхронной при помощи "async".*/
+            const foundBooks: BookViewModel[] = await booksRepository.findBooksByTitle(req.query.title?.toString(), db);
+
+            /*"performance.now()" это метод из Node.js, который возвращает текущую метку времени в миллисекундах, где 0
+            представляет начало текущего процесса Node.js. Имитируем задержку в 3 секунды. Если после этого запроса,
+            сразу сделать какой-то другой запрос, то оба запроса будут ждать эту задержку в 3 секунды.*/
+            // let start = performance.now();
+            // console.log(start);
+            // while (performance.now() - start < 3000) {
+            //     console.log(performance.now() - start);
+            // }
+
+            /*Здесь же поскольку метод "setInterval()" работает асинхронно, то 3-х секундная задержка повлияет только
+            на этот запрос.*/
+            // setInterval(() => {
+            //     res.json(foundBooks);
+            // }, 3000);
+
+            res.json(foundBooks);
+
+            /*В консоли можно использовать такую команду:
+            fetch('http://localhost:3000/page-one?title=two', {method: 'GET'})
+                .then(res => res.json())
+                .then(json => console.log(json))
+            */
+        });
 
     /*Здесь при типизации req нас интересует только первое, то есть URI-параметры, поэтому остальное можно не указывать.
     Нужно помнить, что хоть наш id является цифрой, сами URI-параметры являются строками.*/
-    router.get('/:id', (req: RequestWithParams<GetURIParamsIDBookModel>,
-                        res: Response<BookViewModel>) => {
-        const foundBook = booksRepository.findBookByID(req.params.id, db);
+    router.get('/:id', async (req: RequestWithParams<GetURIParamsIDBookModel>,
+                              res: Response<BookViewModel>): Promise<void> => {
+
+        const foundBook: BookViewModel | undefined = await booksRepository.findBookByID(req.params.id, db);
 
         /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
         в которой отправляем код сервера и выходим из функции.*/
@@ -73,8 +94,9 @@ export const getBooksRouter = (db: DBType) => {
         titleIsNotEmptyValidationMiddleware,
         titleIsOfCorrectLengthValidationMiddleware,
         titleValidationMiddleware,
-        (req: RequestWithBody<CreateBookModel>, res: Response<BookViewModel>) => {
-            const createdBook = booksRepository.createBookWithTitle(req.body.title, db);
+        async (req: RequestWithBody<CreateBookModel>, res: Response<BookViewModel>): Promise<void> => {
+
+            const createdBook: BookViewModel = await booksRepository.createBookWithTitle(req.body.title, db);
 
             /*При помощи метода "status()" уставливаем код ответа сервера при помощи чейнинга.*/
             res
@@ -94,30 +116,34 @@ export const getBooksRouter = (db: DBType) => {
         });
 
     /*D - Delete*/
-    router.delete('/:id', (req: RequestWithParams<DeleteURIParamsIDBookModel>, res: Response) => {
-        booksRepository.deleteBookByID(req.params.id, db);
-        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+    router.delete('/:id',
+        async (req: RequestWithParams<DeleteURIParamsIDBookModel>, res: Response): Promise<void> => {
 
-        /*В консоли можно использовать такую команду:
-        fetch('http://localhost:3000/page-one/1', {method: 'DELETE'})
-            .then(res => res.json())
-            .then(json => console.log(json))
+            await booksRepository.deleteBookByID(req.params.id, db);
+            res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 
-        Для проверки удаления можно использовать такую команду:
-        fetch('http://localhost:3000/page-one', {method: 'GET'})
-            .then(res => res.json())
-            .then(json => console.log(json))
-        */
-    });
+            /*В консоли можно использовать такую команду:
+            fetch('http://localhost:3000/page-one/1', {method: 'DELETE'})
+                .then(res => res.json())
+                .then(json => console.log(json))
+
+            Для проверки удаления можно использовать такую команду:
+            fetch('http://localhost:3000/page-one', {method: 'GET'})
+                .then(res => res.json())
+                .then(json => console.log(json))
+            */
+        });
 
     /*U - Update*/
     router.put('/:id',
         titleIsNotEmptyValidationMiddleware,
         titleIsOfCorrectLengthValidationMiddleware,
         titleValidationMiddleware,
-        (req: RequestWithParamsAndBody<UpdateURIParamsIDBookModel, UpdateBookModel>,
-         res: Response) => {
-            const foundBook = booksRepository.updateBookTitleByID(req.body.title, req.params.id, db);
+        async (req: RequestWithParamsAndBody<UpdateURIParamsIDBookModel, UpdateBookModel>,
+               res: Response): Promise<void> => {
+
+            const foundBook: BookType | undefined = await booksRepository.updateBookTitleByID(req.body.title,
+                req.params.id, db);
 
             if (!foundBook) {
                 res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);

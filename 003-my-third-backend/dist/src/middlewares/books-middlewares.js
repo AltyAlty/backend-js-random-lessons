@@ -8,7 +8,7 @@ const utils_1 = require("../utils");
 exports.titleIsNotEmptyValidationMiddleware = (0, express_validator_1.body)('title')
     .not().isEmpty({ ignore_whitespace: true }).withMessage('title must not be empty');
 exports.titleIsOfCorrectLengthValidationMiddleware = (0, express_validator_1.body)('title')
-    .isLength({ min: 3, max: 10 }).withMessage('title must be min: 3, max: 10');
+    .isLength({ min: 3, max: 20 }).withMessage('title must be min: 3, max: 20');
 const titleValidationMiddleware = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
