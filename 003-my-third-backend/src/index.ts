@@ -10,6 +10,7 @@ yarn tsc --init
 yarn add -D jest ts-jest @types/jest supertest @types/supertest
 yarn ts-jest config:init
 yarn add express-validator
+yarn add mongodb
 прочитать следующий комментарий
 */
 
@@ -60,16 +61,26 @@ yarn ts-jest config:init
 
 "express-validator" это набор промежуточных слоев для Express, в который входит обширная коллекция валидаторов и
 дезинфицирующих средств, предлагаемых "validator.js". Для установки нужно ввести: yarn add express-validator
+
+Чтобы иметь возможность подключаться к MongoDB устанавливаем специальный драйвер под Node.js: yarn add mongodb
 */
 
 /*Этот файл "index.ts" служит главной точкой входа в приложении, поэтому здесь просто подключается "app" и происходит
 запуск прослушивания порта.*/
 import {app} from './app';
+import {runDB} from './db/db';
 
 /*Делаем так, чтобы порт определялся автоматически от окружения.*/
 const port = process.env.PORT || 3000;
 
-/*Устанавлиаем какой порт прослушивается.*/
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
-});
+const startApp = async () => {
+    /*Почему то все работало даже без этой функции.*/
+    await runDB();
+    /*Устанавлиаем какой порт прослушивается.*/
+    app.listen(port, () => {
+        console.log(`Example app listening on port ${port}`);
+    });
+};
+
+startApp();
+

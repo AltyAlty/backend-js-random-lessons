@@ -1,7 +1,7 @@
 import {DBType} from '../db/db';
 
 export const mainPageRepository = {
-    getMainPageContent(db: DBType) {
+    async getMainPageContent(db: DBType): Promise<string>  {
         return db.mainPageContent;
     }
 };

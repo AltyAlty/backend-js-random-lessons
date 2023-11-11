@@ -10,8 +10,8 @@ import {UpdateURIParamsIDBookModel} from '../models/UpdateURIParamsIDBookModel';
 import {UpdateBookModel} from '../models/UpdateBookModel';
 import {HTTP_STATUSES} from '../utils';
 /*Импортируем ДБ.*/
-import {BookType, DBType} from '../db/db';
-import {booksRepository} from '../repositories/books-repository';
+import {DBType} from '../db/db';
+import {booksRepository} from '../repositories/books-repository-db';
 import {
     titleIsNotEmptyValidationMiddleware,
     titleIsOfCorrectLengthValidationMiddleware, titleValidationMiddleware
@@ -71,7 +71,7 @@ export const getBooksRouter = (db: DBType) => {
     router.get('/:id', async (req: RequestWithParams<GetURIParamsIDBookModel>,
                               res: Response<BookViewModel>): Promise<void> => {
 
-        const foundBook: BookViewModel | undefined = await booksRepository.findBookByID(req.params.id, db);
+        const foundBook: BookViewModel | null = await booksRepository.findBookByID(req.params.id, db);
 
         /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
         в которой отправляем код сервера и выходим из функции.*/
@@ -142,7 +142,7 @@ export const getBooksRouter = (db: DBType) => {
         async (req: RequestWithParamsAndBody<UpdateURIParamsIDBookModel, UpdateBookModel>,
                res: Response): Promise<void> => {
 
-            const foundBook: BookType | undefined = await booksRepository.updateBookTitleByID(req.body.title,
+            const foundBook: BookViewModel | null = await booksRepository.updateBookTitleByID(req.body.title,
                 req.params.id, db);
 
             if (!foundBook) {

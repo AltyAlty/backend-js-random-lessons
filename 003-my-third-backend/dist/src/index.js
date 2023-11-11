@@ -11,8 +11,18 @@ yarn tsc --init
 yarn add -D jest ts-jest @types/jest supertest @types/supertest
 yarn ts-jest config:init
 yarn add express-validator
+yarn add mongodb
 прочитать следующий комментарий
 */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 /*
 Установка "yarn" (после его установки, лучше не использоват одновременно с npm): npm install --global yarn
@@ -61,13 +71,21 @@ yarn ts-jest config:init
 
 "express-validator" это набор промежуточных слоев для Express, в который входит обширная коллекция валидаторов и
 дезинфицирующих средств, предлагаемых "validator.js". Для установки нужно ввести: yarn add express-validator
+
+Чтобы иметь возможность подключаться к MongoDB устанавливаем специальный драйвер под Node.js: yarn add mongodb
 */
 /*Этот файл "index.ts" служит главной точкой входа в приложении, поэтому здесь просто подключается "app" и происходит
 запуск прослушивания порта.*/
 const app_1 = require("./app");
+const db_1 = require("./db/db");
 /*Делаем так, чтобы порт определялся автоматически от окружения.*/
 const port = process.env.PORT || 3000;
-/*Устанавлиаем какой порт прослушивается.*/
-app_1.app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
+    /*Почему то все работало даже без этой функции.*/
+    yield (0, db_1.runDB)();
+    /*Устанавлиаем какой порт прослушивается.*/
+    app_1.app.listen(port, () => {
+        console.log(`Example app listening on port ${port}`);
+    });
 });
+startApp();

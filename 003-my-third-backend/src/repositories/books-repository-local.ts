@@ -1,9 +1,3 @@
-/*
-routes - UI
-repositories - DAL
-db - BLL
-*/
-
 /*Импортируем ДБ.*/
 import {BookType, DBType} from '../db/db';
 import {BookViewModel} from '../models/BookViewModel';
@@ -19,7 +13,6 @@ export const booksRepository = {
     /*Используем "async", чтобы то, что возвращается функцией, обворачивалось в промис.*/
     async findBooksByTitle(title: string | undefined, db: DBType): Promise<BookViewModel[]> {
         let foundBooks: BookType[] = db.books;
-
         /*Метод "filter()" создает новый массив со всеми элементами, прошедшими проверку, задаваемую в передаваемой
         функции. Метод "indexOf()" возвращает первый индекс, по которому данный элемент может быть найден в массиве или
         -1, если такого индекса нет. Здесь мы берем каждый объект из массива "db.books", у каждого этого объекта берем
@@ -29,10 +22,7 @@ export const booksRepository = {
         которых было возвращено методом "indexOf()" числа равные или меньшие -1. То есть в итоге мы получим массив
         только с теми книгами, чей заголовок совпадает указанным нами query-параметром, который находится в находится в
         "req", то есть в содержащем данные о запросе объекте, внутри свойства "query".*/
-        if (title) {
-            foundBooks = foundBooks.filter(c => c.title.indexOf(title as string) > -1);
-        }
-
+        if (title) foundBooks = foundBooks.filter(c => c.title.indexOf(title as string) > -1);
         /*Метод "map()" создает новый массив с результатом вызова указанной функции для каждого элемента массива. Хоть
         мы и указали, что в ответе клиенту должен возвращаться массив типов "BookViewModel", TypeScript все равно не
         ругается, если мы ответе отправляем клиенту массив типов "BookType", когда тип "BookType" на одно свойство
@@ -42,7 +32,7 @@ export const booksRepository = {
         return foundBooks.map(mapDBBookToViewModel);
     },
 
-    async findBookByID(id: string, db: DBType): Promise<BookViewModel | undefined> {
+    async findBookByID(id: string, db: DBType): Promise<BookViewModel | null> {
         /*Используем здесь ":id", чтобы работать с URI-параметром в адресной строке. Метод "find()" возвращает значение
         первого найденного в массиве элемента, которое удовлетворяет условию переданному в callback-функции. В противном
         случае возвращается undefined. То есть здесь мы ищем такой объект в массиве "db.books", у которого свойство "id"
@@ -50,13 +40,9 @@ export const booksRepository = {
         запросе, внутри свойства "params". Этот URI-параметр изначально является строкой, поэтому приводим его к числу
         при помощи "+".*/
         const foundBook: BookType | undefined = db.books.find(c => c.id === +id);
-
         /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
         в которой выходим из функции.*/
-        if (!foundBook) {
-            return undefined;
-        }
-
+        if (!foundBook) return null;
         return mapDBBookToViewModel(foundBook);
     },
 
@@ -82,14 +68,10 @@ export const booksRepository = {
         db.books = db.books.filter(c => c.id !== +id);
     },
 
-    async updateBookTitleByID(title: string, id: string, db: DBType): Promise<BookType | undefined> {
+    async updateBookTitleByID(title: string, id: string, db: DBType): Promise<BookViewModel | null> {
         const foundBook: BookType | undefined = db.books.find(c => c.id === +id);
-
-        if (!foundBook) {
-            return undefined;
-        }
-
+        if (!foundBook) return null;
         foundBook.title = title;
-        return foundBook;
+        return (mapDBBookToViewModel(foundBook));
     }
 };

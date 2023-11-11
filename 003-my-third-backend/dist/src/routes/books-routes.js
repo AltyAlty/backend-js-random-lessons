@@ -16,7 +16,7 @@ exports.getAuthorsRouter = exports.requestCounterMiddleware = exports.authGuardM
 /*В целях типизации импортируем Response из Express.*/
 const express_1 = __importDefault(require("express"));
 const utils_1 = require("../utils");
-const books_repository_1 = require("../repositories/books-repository");
+const books_repository_db_1 = require("../repositories/books-repository-db");
 const books_middlewares_1 = require("../middlewares/books-middlewares");
 const getBooksRouter = (db) => {
     /*Используем роутинг, который предоставляется в Express. Создаем роутер, которые далее конфигурируем, то есть
@@ -38,7 +38,7 @@ const getBooksRouter = (db) => {
         var _a;
         /*Используем "await", чтобы дождаться, когда зарезольвиться промис, чтобы получить найденные книги. Для
         этого нашу функцию сделали асинхронной при помощи "async".*/
-        const foundBooks = yield books_repository_1.booksRepository.findBooksByTitle((_a = req.query.title) === null || _a === void 0 ? void 0 : _a.toString(), db);
+        const foundBooks = yield books_repository_db_1.booksRepository.findBooksByTitle((_a = req.query.title) === null || _a === void 0 ? void 0 : _a.toString(), db);
         /*"performance.now()" это метод из Node.js, который возвращает текущую метку времени в миллисекундах, где 0
         представляет начало текущего процесса Node.js. Имитируем задержку в 3 секунды. Если после этого запроса,
         сразу сделать какой-то другой запрос, то оба запроса будут ждать эту задержку в 3 секунды.*/
@@ -62,7 +62,7 @@ const getBooksRouter = (db) => {
     /*Здесь при типизации req нас интересует только первое, то есть URI-параметры, поэтому остальное можно не указывать.
     Нужно помнить, что хоть наш id является цифрой, сами URI-параметры являются строками.*/
     router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const foundBook = yield books_repository_1.booksRepository.findBookByID(req.params.id, db);
+        const foundBook = yield books_repository_db_1.booksRepository.findBookByID(req.params.id, db);
         /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
         в которой отправляем код сервера и выходим из функции.*/
         if (!foundBook) {
@@ -78,7 +78,7 @@ const getBooksRouter = (db) => {
     }));
     /*C - Create*/
     router.post('/', books_middlewares_1.titleIsNotEmptyValidationMiddleware, books_middlewares_1.titleIsOfCorrectLengthValidationMiddleware, books_middlewares_1.titleValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const createdBook = yield books_repository_1.booksRepository.createBookWithTitle(req.body.title, db);
+        const createdBook = yield books_repository_db_1.booksRepository.createBookWithTitle(req.body.title, db);
         /*При помощи метода "status()" уставливаем код ответа сервера при помощи чейнинга.*/
         res
             .status(utils_1.HTTP_STATUSES.CREATED_201)
@@ -96,7 +96,7 @@ const getBooksRouter = (db) => {
     }));
     /*D - Delete*/
     router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        yield books_repository_1.booksRepository.deleteBookByID(req.params.id, db);
+        yield books_repository_db_1.booksRepository.deleteBookByID(req.params.id, db);
         res.sendStatus(utils_1.HTTP_STATUSES.NO_CONTENT_204);
         /*В консоли можно использовать такую команду:
         fetch('http://localhost:3000/page-one/1', {method: 'DELETE'})
@@ -111,7 +111,7 @@ const getBooksRouter = (db) => {
     }));
     /*U - Update*/
     router.put('/:id', books_middlewares_1.titleIsNotEmptyValidationMiddleware, books_middlewares_1.titleIsOfCorrectLengthValidationMiddleware, books_middlewares_1.titleValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const foundBook = yield books_repository_1.booksRepository.updateBookTitleByID(req.body.title, req.params.id, db);
+        const foundBook = yield books_repository_db_1.booksRepository.updateBookTitleByID(req.body.title, req.params.id, db);
         if (!foundBook) {
             res.sendStatus(utils_1.HTTP_STATUSES.NOT_FOUND_404);
             return;

@@ -3,7 +3,7 @@ export type BookViewModel = {
     /*
      * id of an existing book to return to a client
      */
-    id: number,
+    id: number
     /*
      * title of an existing book to return to a client
      */
