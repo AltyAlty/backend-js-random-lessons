@@ -1,6 +1,6 @@
 MongoDB - это NoSQL-СУБД, которая использует JSON-подобные документы и схему базы данных.
 
-Создание БД: ./mongod.exe --dbpath .\data\db
+Запуск БД: ./mongod.exe --dbpath .\data\db
 Скачать zip-версию MongoDB и нажать Win+R, чтобы запустить там файл mongod.exe. В Windows PowerShell нужно писать
 "./mongod.exe".
 По стандарту MongoDB пытается положить свои файлы в "\data\db". Чтобы поменять этот путь можно при запуске программы
