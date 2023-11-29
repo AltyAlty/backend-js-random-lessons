@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.booksRepository = void 0;
+/*Импортируем ДБ.*/
+const db_1 = require("../db/db");
 const mapDBBookToViewModel = (book) => {
     return {
         id: book.id,
@@ -18,9 +20,9 @@ const mapDBBookToViewModel = (book) => {
 };
 exports.booksRepository = {
     /*Используем "async", чтобы то, что возвращается функцией, обворачивалось в промис.*/
-    findBooksByTitle(title, db) {
+    findBooksByTitle(title) {
         return __awaiter(this, void 0, void 0, function* () {
-            let foundBooks = db.books;
+            let foundBooks = db_1.db.books;
             /*Метод "filter()" создает новый массив со всеми элементами, прошедшими проверку, задаваемую в передаваемой
             функции. Метод "indexOf()" возвращает первый индекс, по которому данный элемент может быть найден в массиве или
             -1, если такого индекса нет. Здесь мы берем каждый объект из массива "db.books", у каждого этого объекта берем
@@ -41,7 +43,7 @@ exports.booksRepository = {
             return foundBooks.map(mapDBBookToViewModel);
         });
     },
-    findBookByID(id, db) {
+    findBookByID(id) {
         return __awaiter(this, void 0, void 0, function* () {
             /*Используем здесь ":id", чтобы работать с URI-параметром в адресной строке. Метод "find()" возвращает значение
             первого найденного в массиве элемента, которое удовлетворяет условию переданному в callback-функции. В противном
@@ -49,7 +51,7 @@ exports.booksRepository = {
             совпадает с URI-параметром "id", который в свою очередь находится в "req", то есть в содержащем данные о
             запросе, внутри свойства "params". Этот URI-параметр изначально является строкой, поэтому приводим его к числу
             при помощи "+".*/
-            const foundBook = db.books.find(c => c.id === +id);
+            const foundBook = db_1.db.books.find(c => c.id === +id);
             /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
             в которой выходим из функции.*/
             if (!foundBook)
@@ -57,31 +59,22 @@ exports.booksRepository = {
             return mapDBBookToViewModel(foundBook);
         });
     },
-    createBookWithTitle(title, db) {
+    createBookWithTitle(newBook) {
         return __awaiter(this, void 0, void 0, function* () {
-            const newBook = {
-                /*"+(new Date())" - таким образом генерируем случайно число. На самом деле генерация новых id это задача
-                сервера, то есть клиент не должен их сам указывать при создании нового ресурса.*/
-                id: +(new Date()),
-                /*Если какое-то свойство в объекте undefined, то при переводе его в JSON оно отбрасывается.*/
-                title: title,
-                customersCount: 0
-            };
-            db.books.push(newBook);
-            return (mapDBBookToViewModel(newBook));
+            db_1.db.books.push(newBook);
         });
     },
-    deleteBookByID(id, db) {
+    deleteBookByID(id) {
         return __awaiter(this, void 0, void 0, function* () {
             /*Здесь мы ищем такой объект в массиве "db.books", у которого свойство "id" не совпадает с URI-параметром "id",
             и отфильтровываем его так, чтобы получился массив без этого объекта. Тем самым мы осуществляем удаление
             элемента.*/
-            db.books = db.books.filter(c => c.id !== +id);
+            db_1.db.books = db_1.db.books.filter(c => c.id !== +id);
         });
     },
-    updateBookTitleByID(title, id, db) {
+    updateBookTitleByID(title, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const foundBook = db.books.find(c => c.id === +id);
+            const foundBook = db_1.db.books.find(c => c.id === +id);
             if (!foundBook)
                 return null;
             foundBook.title = title;

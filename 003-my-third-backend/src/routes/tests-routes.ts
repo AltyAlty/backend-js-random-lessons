@@ -1,9 +1,9 @@
 import express from 'express';
 import {HTTP_STATUSES} from '../utils';
 /*Импортируем ДБ.*/
-import {DBType} from '../db/db';
+import {db} from '../db/db';
 
-export const getTestsRouter = (db: DBType) => {
+export const getTestsRouter = () => {
     const router = express.Router();
 
     router.delete('/data', (req, res) => {

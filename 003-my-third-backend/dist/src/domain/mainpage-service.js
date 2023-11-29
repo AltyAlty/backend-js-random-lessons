@@ -9,12 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mainPageRepository = void 0;
-const db_1 = require("../db/db");
-exports.mainPageRepository = {
+exports.mainPageService = void 0;
+const mainpage_repository_db_1 = require("../repositories/mainpage-repository-db");
+// import {mainPageRepository} from '../repositories/mainpage-repository-local';
+exports.mainPageService = {
     getMainPageContent() {
         return __awaiter(this, void 0, void 0, function* () {
-            return db_1.db.mainPageContent;
+            const mainPageContent = yield mainpage_repository_db_1.mainPageRepository.getMainPageContent();
+            if (mainPageContent) {
+                return mainPageContent.content;
+            }
+            else {
+                return 'Cannot get main page content';
+            }
         });
     }
 };

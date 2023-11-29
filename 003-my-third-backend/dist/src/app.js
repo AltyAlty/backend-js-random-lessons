@@ -6,8 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.jsonBodyMiddleware = exports.app = void 0;
 /*Подключаем Express.*/
 const express_1 = __importDefault(require("express"));
-/*Импортируем ДБ.*/
-const db_1 = require("./db/db");
 /*Импортируем роутеры нашего приложения.*/
 const books_routes_1 = require("./routes/books-routes");
 const tests_routes_1 = require("./routes/tests-routes");
@@ -26,8 +24,8 @@ exports.app.use(books_routes_1.uselessMiddleware);
 // app.use(authGuardMiddleware);
 /*Подключаем к нашему приложению на Express роутеры. Здесь нужно указать какой-то корневой путь адреса, к которому
 роутеры будут дописывать какие-то подпути в за висимости от их конфигурации.*/
-exports.app.use('/page-one', (0, books_routes_1.getBooksRouter)(db_1.db));
-exports.app.use('/__test__', (0, tests_routes_1.getTestsRouter)(db_1.db));
-exports.app.use('/', (0, mainpage_routes_1.getMainPageRouter)(db_1.db));
+exports.app.use('/page-one', (0, books_routes_1.getBooksRouter)());
+exports.app.use('/__test__', (0, tests_routes_1.getTestsRouter)());
+exports.app.use('/', (0, mainpage_routes_1.getMainPageRouter)());
 exports.app.use('/interesting', (0, books_routes_1.getInterestingRouter)());
 exports.app.use('/authors', (0, books_routes_1.getAuthorsRouter)());

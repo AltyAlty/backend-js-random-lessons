@@ -6,6 +6,7 @@ import {UpdateBookModel} from '../../src/models/UpdateBookModel';
 import {HTTP_STATUSES} from '../../src/utils';
 import {app} from '../../src/app';
 
+/*Это тесты для локальной версии БД.*/
 describe('/page-one', () => {
     /*Метод "beforeAll()" позволяет запустить какой-то код перед выполнением всех тестов.*/
     beforeAll(async () => {

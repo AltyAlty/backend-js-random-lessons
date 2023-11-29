@@ -1,5 +1,5 @@
 /*Импортируем ДБ.*/
-import {BookType, DBType} from '../db/db';
+import {BookType, db} from '../db/db';
 import {BookViewModel} from '../models/BookViewModel';
 
 const mapDBBookToViewModel = (book: BookType): BookViewModel => {
@@ -11,7 +11,7 @@ const mapDBBookToViewModel = (book: BookType): BookViewModel => {
 
 export const booksRepository = {
     /*Используем "async", чтобы то, что возвращается функцией, обворачивалось в промис.*/
-    async findBooksByTitle(title: string | undefined, db: DBType): Promise<BookViewModel[]> {
+    async findBooksByTitle(title: string | undefined): Promise<BookViewModel[]> {
         let foundBooks: BookType[] = db.books;
         /*Метод "filter()" создает новый массив со всеми элементами, прошедшими проверку, задаваемую в передаваемой
         функции. Метод "indexOf()" возвращает первый индекс, по которому данный элемент может быть найден в массиве или
@@ -32,7 +32,7 @@ export const booksRepository = {
         return foundBooks.map(mapDBBookToViewModel);
     },
 
-    async findBookByID(id: string, db: DBType): Promise<BookViewModel | null> {
+    async findBookByID(id: string): Promise<BookViewModel | null> {
         /*Используем здесь ":id", чтобы работать с URI-параметром в адресной строке. Метод "find()" возвращает значение
         первого найденного в массиве элемента, которое удовлетворяет условию переданному в callback-функции. В противном
         случае возвращается undefined. То есть здесь мы ищем такой объект в массиве "db.books", у которого свойство "id"
@@ -46,29 +46,18 @@ export const booksRepository = {
         return mapDBBookToViewModel(foundBook);
     },
 
-    async createBookWithTitle(title: string, db: DBType): Promise<BookViewModel> {
-        const newBook: BookType = {
-            /*"+(new Date())" - таким образом генерируем случайно число. На самом деле генерация новых id это задача
-            сервера, то есть клиент не должен их сам указывать при создании нового ресурса.*/
-            id: +(new Date()),
-            /*Если какое-то свойство в объекте undefined, то при переводе его в JSON оно отбрасывается.*/
-            title: title,
-            customersCount: 0
-        };
-
+    async createBookWithTitle(newBook: BookType): Promise<void> {
         db.books.push(newBook);
-
-        return (mapDBBookToViewModel(newBook));
     },
 
-    async deleteBookByID(id: string, db: DBType): Promise<void> {
+    async deleteBookByID(id: string): Promise<void> {
         /*Здесь мы ищем такой объект в массиве "db.books", у которого свойство "id" не совпадает с URI-параметром "id",
         и отфильтровываем его так, чтобы получился массив без этого объекта. Тем самым мы осуществляем удаление
         элемента.*/
         db.books = db.books.filter(c => c.id !== +id);
     },
 
-    async updateBookTitleByID(title: string, id: string, db: DBType): Promise<BookViewModel | null> {
+    async updateBookTitleByID(title: string, id: string): Promise<BookViewModel | null> {
         const foundBook: BookType | undefined = db.books.find(c => c.id === +id);
         if (!foundBook) return null;
         foundBook.title = title;

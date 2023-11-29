@@ -1,7 +1,8 @@
 /*
-routes - UI
-repositories - DAL
-db - BLL
+routes - UI - Presentation Layer
+services - BLL - Business Logic Layer
+repositories - DAL - Data Access Layer
+db - Data Source
 */
 
 /*
@@ -61,13 +62,15 @@ export type BookType = {
     customersCount: number
 };
 
+export type mainPageContentType = { content: string };
+
 export type DBType = {
-    mainPageContent: string
+    mainPageContent: mainPageContentType
     books: BookType[]
 };
 
 export const db: DBType = {
-    mainPageContent: '<h1>Hello!</h1>',
+    mainPageContent: {content: '<h1>Hello!</h1>'},
 
     books: [
         {id: 1, title: 'book-one', customersCount: 5},

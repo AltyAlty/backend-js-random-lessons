@@ -10,17 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.booksRepository = void 0;
-/*Импортируем ДБ.*/
 const db_1 = require("../db/db");
-const mapDBBookToViewModel = (book) => {
-    return {
-        id: book.id,
-        title: book.title
-    };
-};
+const books_service_1 = require("../domain/books-service");
 exports.booksRepository = {
     /*Используем "async", чтобы то, что возвращается функцией, обворачивалось в промис.*/
-    findBooksByTitle(title, db) {
+    findBooksByTitle(title) {
         return __awaiter(this, void 0, void 0, function* () {
             let foundBooks;
             if (title) {
@@ -36,45 +30,36 @@ exports.booksRepository = {
             ругается, если мы ответе отправляем клиенту массив типов "BookType", когда тип "BookType" на одно свойство
             больше типа "BookViewModel". Это утинная типизация. Чтобы избежать из-за такого поведения TypeScript проблем,
             перед отправкой клиенту данных, мы избавляемся от ненужных для него свойств при помощи метода "map()".*/
-            return foundBooks.map(mapDBBookToViewModel);
+            return foundBooks.map(books_service_1.mapDBBookToViewModel);
         });
     },
-    findBookByID(id, db) {
+    findBookByID(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const foundBook = yield db_1.booksCollection.findOne({ id: +id });
             /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
             в которой выходим из функции.*/
             if (!foundBook)
                 return null;
-            return mapDBBookToViewModel(foundBook);
+            return (0, books_service_1.mapDBBookToViewModel)(foundBook);
         });
     },
-    createBookWithTitle(title, db) {
+    createBookWithTitle(newBook) {
         return __awaiter(this, void 0, void 0, function* () {
-            const newBook = {
-                /*"+(new Date())" - таким образом генерируем случайно число. На самом деле генерация новых id это задача
-                сервера, то есть клиент не должен их сам указывать при создании нового ресурса.*/
-                id: +(new Date()),
-                /*Если какое-то свойство в объекте undefined, то при переводе его в JSON оно отбрасывается.*/
-                title: title,
-                customersCount: 0
-            };
-            const result = yield db_1.booksCollection.insertOne(newBook);
-            return (mapDBBookToViewModel(newBook));
+            return yield db_1.booksCollection.insertOne(newBook);
         });
     },
-    deleteBookByID(id, db) {
+    deleteBookByID(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield db_1.booksCollection.deleteOne({ id: +id });
+            return yield db_1.booksCollection.deleteOne({ id: +id });
         });
     },
-    updateBookTitleByID(title, id, db) {
+    updateBookTitleByID(title, id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield db_1.booksCollection.updateOne({ id: +id }, { $set: { title: title } });
             const foundBook = yield db_1.booksCollection.findOne({ id: +id });
             if (!foundBook)
                 return null;
-            return mapDBBookToViewModel(foundBook);
+            return (0, books_service_1.mapDBBookToViewModel)(foundBook);
         });
     }
 };

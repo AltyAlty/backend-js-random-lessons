@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMainPageRouter = void 0;
 const express_1 = __importDefault(require("express"));
-const mainpage_repository_db_1 = require("../repositories/mainpage-repository-db");
-const getMainPageRouter = (db) => {
+const mainpage_service_1 = require("../domain/mainpage-service");
+const getMainPageRouter = () => {
     const router = express_1.default.Router();
     /*Если будет запрос по адресу '/', то запустится указанная callback-функция. Метод "send()" это аналог "write()"
     из библиотеки "http". Этот метод в зависимости от передаваемых данных сам меняет заголовок "Content-Type" в ответе.
@@ -30,7 +30,7 @@ const getMainPageRouter = (db) => {
         /*Передаем объект, чтобы можно было работать с форматом JSON.*/
         // res.send({message: 'Hello!'});
         // res.send('Hello!');
-        const mainPageContent = yield mainpage_repository_db_1.mainPageRepository.getMainPageContent(db);
+        const mainPageContent = yield mainpage_service_1.mainPageService.getMainPageContent();
         res.send(mainPageContent);
         // res.send(404);
         /*Для передачи JSON-данных можно использовать метод "json()". Этот метод преобразовывать данные в JSON сам.*/

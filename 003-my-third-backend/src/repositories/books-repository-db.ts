@@ -1,17 +1,11 @@
-/*Импортируем ДБ.*/
-import {booksCollection, BookType, DBType} from '../db/db';
+import {booksCollection, BookType} from '../db/db';
 import {BookViewModel} from '../models/BookViewModel';
-
-const mapDBBookToViewModel = (book: BookType): BookViewModel => {
-    return {
-        id: book.id,
-        title: book.title
-    };
-};
+import {DeleteResult, InsertOneResult} from 'mongodb';
+import {mapDBBookToViewModel} from '../domain/books-service';
 
 export const booksRepository = {
     /*Используем "async", чтобы то, что возвращается функцией, обворачивалось в промис.*/
-    async findBooksByTitle(title: string | undefined, db: DBType): Promise<BookViewModel[]> {
+    async findBooksByTitle(title: string | undefined): Promise<BookViewModel[]> {
         let foundBooks: BookType[];
 
         if (title) {
@@ -30,7 +24,7 @@ export const booksRepository = {
         return foundBooks.map(mapDBBookToViewModel);
     },
 
-    async findBookByID(id: string, db: DBType): Promise<BookViewModel | null> {
+    async findBookByID(id: string): Promise<BookViewModel | null> {
         const foundBook: BookType | null = await booksCollection.findOne({id: +id});
 
         /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
@@ -39,25 +33,15 @@ export const booksRepository = {
         return mapDBBookToViewModel(foundBook);
     },
 
-    async createBookWithTitle(title: string, db: DBType): Promise<BookViewModel> {
-        const newBook: BookType = {
-            /*"+(new Date())" - таким образом генерируем случайно число. На самом деле генерация новых id это задача
-            сервера, то есть клиент не должен их сам указывать при создании нового ресурса.*/
-            id: +(new Date()),
-            /*Если какое-то свойство в объекте undefined, то при переводе его в JSON оно отбрасывается.*/
-            title: title,
-            customersCount: 0
-        };
-
-        const result = await booksCollection.insertOne(newBook);
-        return (mapDBBookToViewModel(newBook));
+    async createBookWithTitle(newBook: BookType): Promise<InsertOneResult<BookType>> {
+        return await booksCollection.insertOne(newBook);
     },
 
-    async deleteBookByID(id: string, db: DBType): Promise<void> {
-        const result = await booksCollection.deleteOne({id: +id});
+    async deleteBookByID(id: string): Promise<DeleteResult> {
+        return await booksCollection.deleteOne({id: +id});
     },
 
-    async updateBookTitleByID(title: string, id: string, db: DBType): Promise<BookViewModel | null> {
+    async updateBookTitleByID(title: string, id: string): Promise<BookViewModel | null> {
         const result = await booksCollection.updateOne({id: +id}, {$set: {title: title}});
 
         const foundBook: BookType | null = await booksCollection.findOne({id: +id});

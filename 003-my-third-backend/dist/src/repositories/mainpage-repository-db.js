@@ -12,15 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.mainPageRepository = void 0;
 const db_1 = require("../db/db");
 exports.mainPageRepository = {
-    getMainPageContent(db) {
+    getMainPageContent() {
         return __awaiter(this, void 0, void 0, function* () {
-            const mainPageContent = yield db_1.mainPageContentCollection.findOne({});
-            if (mainPageContent) {
-                return mainPageContent.content;
-            }
-            else {
-                return 'Cannot get main page content';
-            }
+            return yield db_1.mainPageContentCollection.findOne({});
         });
     }
 };

@@ -9,16 +9,14 @@ import {DeleteURIParamsIDBookModel} from '../models/DeleteURIParamsIDBookModel';
 import {UpdateURIParamsIDBookModel} from '../models/UpdateURIParamsIDBookModel';
 import {UpdateBookModel} from '../models/UpdateBookModel';
 import {HTTP_STATUSES} from '../utils';
-/*Импортируем ДБ.*/
-import {DBType} from '../db/db';
-import {booksRepository} from '../repositories/books-repository-db';
+import {booksService} from '../domain/books-service';
 import {
     titleIsNotEmptyValidationMiddleware,
     titleIsOfCorrectLengthValidationMiddleware, titleValidationMiddleware
 } from '../middlewares/books-middlewares';
 
 
-export const getBooksRouter = (db: DBType) => {
+export const getBooksRouter = () => {
     /*Используем роутинг, который предоставляется в Express. Создаем роутер, которые далее конфигурируем, то есть
     описываем различные запросы, которые этот роутер должен будет обрабатывать. В конце возвращаем этот роутер,
     чтобы его можно было использовать в нашем приложении. Такой роутинг позволяет декомпозировать наше backend
@@ -40,7 +38,7 @@ export const getBooksRouter = (db: DBType) => {
 
             /*Используем "await", чтобы дождаться, когда зарезольвиться промис, чтобы получить найденные книги. Для
             этого нашу функцию сделали асинхронной при помощи "async".*/
-            const foundBooks: BookViewModel[] = await booksRepository.findBooksByTitle(req.query.title?.toString(), db);
+            const foundBooks: BookViewModel[] = await booksService.findBooksByTitle(req.query.title?.toString());
 
             /*"performance.now()" это метод из Node.js, который возвращает текущую метку времени в миллисекундах, где 0
             представляет начало текущего процесса Node.js. Имитируем задержку в 3 секунды. Если после этого запроса,
@@ -71,7 +69,7 @@ export const getBooksRouter = (db: DBType) => {
     router.get('/:id', async (req: RequestWithParams<GetURIParamsIDBookModel>,
                               res: Response<BookViewModel>): Promise<void> => {
 
-        const foundBook: BookViewModel | null = await booksRepository.findBookByID(req.params.id, db);
+        const foundBook: BookViewModel | null = await booksService.findBookByID(req.params.id);
 
         /*Если нужного объекта не было найдено, то мы получим undefined, соотвественно делаем проверку на такой случай,
         в которой отправляем код сервера и выходим из функции.*/
@@ -96,9 +94,9 @@ export const getBooksRouter = (db: DBType) => {
         titleValidationMiddleware,
         async (req: RequestWithBody<CreateBookModel>, res: Response<BookViewModel>): Promise<void> => {
 
-            const createdBook: BookViewModel = await booksRepository.createBookWithTitle(req.body.title, db);
+            const createdBook: BookViewModel = await booksService.createBookWithTitle(req.body.title);
 
-            /*При помощи метода "status()" уставливаем код ответа сервера при помощи чейнинга.*/
+            /*При помощи метода "status()" устанавливаем код ответа сервера при помощи чейнинга.*/
             res
                 .status(HTTP_STATUSES.CREATED_201)
                 .json(createdBook);
@@ -119,7 +117,7 @@ export const getBooksRouter = (db: DBType) => {
     router.delete('/:id',
         async (req: RequestWithParams<DeleteURIParamsIDBookModel>, res: Response): Promise<void> => {
 
-            await booksRepository.deleteBookByID(req.params.id, db);
+            await booksService.deleteBookByID(req.params.id);
             res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 
             /*В консоли можно использовать такую команду:
@@ -142,8 +140,8 @@ export const getBooksRouter = (db: DBType) => {
         async (req: RequestWithParamsAndBody<UpdateURIParamsIDBookModel, UpdateBookModel>,
                res: Response): Promise<void> => {
 
-            const foundBook: BookViewModel | null = await booksRepository.updateBookTitleByID(req.body.title,
-                req.params.id, db);
+            const foundBook: BookViewModel | null = await booksService.updateBookTitleByID(req.body.title,
+                req.params.id);
 
             if (!foundBook) {
                 res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);

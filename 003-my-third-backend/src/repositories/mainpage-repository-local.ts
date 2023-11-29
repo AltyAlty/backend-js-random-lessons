@@ -1,7 +1,7 @@
-import {DBType} from '../db/db';
+import {db, mainPageContentType} from '../db/db';
 
 export const mainPageRepository = {
-    async getMainPageContent(db: DBType): Promise<string>  {
+    async getMainPageContent(): Promise<mainPageContentType> {
         return db.mainPageContent;
     }
 };

@@ -17,6 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
 const utils_1 = require("../../src/utils");
 const app_1 = require("../../src/app");
+/*Это тесты для локальной версии БД.*/
 describe('/page-one', () => {
     /*Метод "beforeAll()" позволяет запустить какой-то код перед выполнением всех тестов.*/
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {

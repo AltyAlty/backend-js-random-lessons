@@ -1,7 +1,5 @@
 /*Подключаем Express.*/
 import express from 'express';
-/*Импортируем ДБ.*/
-import {db} from './db/db';
 /*Импортируем роутеры нашего приложения.*/
 import {
     authGuardMiddleware,
@@ -30,8 +28,8 @@ app.use(uselessMiddleware);
 
 /*Подключаем к нашему приложению на Express роутеры. Здесь нужно указать какой-то корневой путь адреса, к которому
 роутеры будут дописывать какие-то подпути в за висимости от их конфигурации.*/
-app.use('/page-one', getBooksRouter(db));
-app.use('/__test__', getTestsRouter(db));
-app.use('/', getMainPageRouter(db));
+app.use('/page-one', getBooksRouter());
+app.use('/__test__', getTestsRouter());
+app.use('/', getMainPageRouter());
 app.use('/interesting', getInterestingRouter());
 app.use('/authors', getAuthorsRouter());

@@ -1,8 +1,9 @@
 "use strict";
 /*
-routes - UI
-repositories - DAL
-db - BLL
+routes - UI - Presentation Layer
+services - BLL - Business Logic Layer
+repositories - DAL - Data Access Layer
+db - Data Source
 */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -68,7 +69,7 @@ const remoteDB = client.db('bookshop');
 exports.booksCollection = remoteDB.collection('books');
 exports.mainPageContentCollection = remoteDB.collection('mainpage');
 exports.db = {
-    mainPageContent: '<h1>Hello!</h1>',
+    mainPageContent: { content: '<h1>Hello!</h1>' },
     books: [
         { id: 1, title: 'book-one', customersCount: 5 },
         { id: 2, title: 'book-two', customersCount: 6 },

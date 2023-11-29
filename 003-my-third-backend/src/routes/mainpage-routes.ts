@@ -1,8 +1,7 @@
 import express, {Request, Response} from 'express';
-import {DBType} from '../db/db';
-import {mainPageRepository} from '../repositories/mainpage-repository-db';
+import {mainPageService} from '../domain/mainpage-service';
 
-export const getMainPageRouter = (db: DBType) => {
+export const getMainPageRouter = () => {
     const router = express.Router();
 
     /*Если будет запрос по адресу '/', то запустится указанная callback-функция. Метод "send()" это аналог "write()"
@@ -19,7 +18,7 @@ export const getMainPageRouter = (db: DBType) => {
         /*Передаем объект, чтобы можно было работать с форматом JSON.*/
         // res.send({message: 'Hello!'});
         // res.send('Hello!');
-        const mainPageContent = await mainPageRepository.getMainPageContent(db);
+        const mainPageContent = await mainPageService.getMainPageContent();
         res.send(mainPageContent);
         // res.send(404);
 
