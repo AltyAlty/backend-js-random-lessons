@@ -1,0 +1,7 @@
+CQR(S) - Common Query Responsibility (Segregation)
+
+Presentation Layer - API/REST API/Websocket/GraphQl/Graph gRPC
+Business Logic Layer / Application Layer - Application/Services
+Data Access Layer - Repositories/Presentation Layer of another back-end
+
+Для READ-операций можно игнорировать второй слой и, например, сделать для них отдельный репозиторий.
