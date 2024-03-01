@@ -1,7 +1,15 @@
-CQR(S) - Common Query Responsibility (Segregation)
+CQR(S) - Command and Query Responsibility (Segregation)
 
-Presentation Layer - API/REST API/Websocket/GraphQl/Graph gRPC
-Business Logic Layer / Application Layer - Application/Services
-Data Access Layer - Repositories/Presentation Layer of another back-end
+CQR - подход проектирования программного обеспечения, при котором код, изменяющий состояние, отделяется от кода, просто
+читающего это состояние. При CQRS мы делим запросы на две категории: queries (read) и commands (create, update, delete).
 
-Для READ-операций можно игнорировать второй слой и, например, сделать для них отдельный репозиторий.
+CQRS - это примерно тоже самое, но только в более широком контексте.
+
+Presentation Layer / UI - REST API (routes) / Websocket / GraphQl / Graph gRPC
+Business Logic Layer / Application Layer / BLL - services
+Data Access Layer / DAL - repositories / Presentation Layer of another back-end
+
+Для команд нужно проходить все три уровня, а для запросов иногда можно игнорировать BLL и, например, сделать для них
+отдельный query-репозиторий в DAL вместе со специальным серверов оптимизированным для быстрого чтения, поскольку в таких
+случаях порой отсутствует бизнес-логика. Если при запросе необходимо обратиться к API другого сервера, то можно создать
+специальный query-сервис в BLL.
