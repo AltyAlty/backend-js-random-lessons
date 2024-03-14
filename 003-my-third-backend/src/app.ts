@@ -10,6 +10,8 @@ import {
 } from './routes/books-routes';
 import {getTestsRouter} from './routes/tests-routes';
 import {getMainPageRouter} from './routes/mainpage-routes';
+import {usersRouter} from './routes/users-routes';
+import {authRouter} from './routes/auth/auth-router';
 
 /*Создаем приложение на Express.*/
 export const app = express();
@@ -33,3 +35,5 @@ app.use('/__test__', getTestsRouter());
 app.use('/', getMainPageRouter());
 app.use('/interesting', getInterestingRouter());
 app.use('/authors', getAuthorsRouter());
+app.use('/registration', usersRouter);
+app.use('/login', authRouter);

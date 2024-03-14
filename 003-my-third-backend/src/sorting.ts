@@ -3,7 +3,7 @@
 yarn ts-node .\src\sorting.ts
 */
 
-const {ObjectId} = require('mongodb');
+import {ObjectId} from 'mongodb';
 
 /*Чем позднее экземпляр "ObjectId" из "MongoDB" создан, тем он больше.*/
 let objID01 = new ObjectId();

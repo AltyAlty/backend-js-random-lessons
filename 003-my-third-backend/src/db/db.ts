@@ -38,15 +38,26 @@ db.getCollection('mainpage').insertMany(
     ]
 )
 
+db.getCollection('users').insertMany(
+    [
+        {userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: ''},
+        {userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: ''},
+        {userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: ''},
+    ]
+)
+
 Проверка создания документов в коллекции в БД для MongoDB:
 db.getCollection('books').find({})
 db.getCollection('mainpage').find({})
+db.getCollection('users').find({})
 
 Очистка документов в коллекции в БД для MongoDB:
 db.getCollection('books').deleteMany({})
 db.getCollection('mainpage').deleteMany({})
+db.getCollection('users').deleteMany({})
 */
-import {MongoClient} from 'mongodb';
+import {MongoClient, ObjectId} from 'mongodb';
+import {UserDBType} from '../types';
 
 /*Делаем так, чтобы URI определялся автоматически от окружения.*/
 const mongoURI = process.env.mongoURI || 'mongodb://0.0.0.0:27017';
@@ -71,6 +82,7 @@ const remoteDB = client.db('bookshop');
 /*Получаем коллекцию из MongoDB. При помощи "<BookViewModel>" типизировали документы из коллекции.*/
 export const booksCollection = remoteDB.collection<BookType>('books');
 export const mainPageContentCollection = remoteDB.collection('mainpage');
+export const usersCollection = remoteDB.collection<UserDBType>('users');
 
 export type BookType = {
     id: number
@@ -83,6 +95,7 @@ export type mainPageContentType = { content: string };
 export type DBType = {
     mainPageContent: mainPageContentType
     books: BookType[]
+    users: UserDBType[]
 };
 
 export const db: DBType = {
@@ -93,5 +106,11 @@ export const db: DBType = {
         {id: 2, title: 'book-two', customersCount: 6},
         {id: 3, title: 'book-three', customersCount: 7},
         {id: 4, title: 'book-four', customersCount: 8}
+    ],
+
+    users: [
+        {_id: new ObjectId, userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: new Date()},
+        {_id: new ObjectId, userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: new Date()},
+        {_id: new ObjectId, userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: new Date()},
     ]
 };

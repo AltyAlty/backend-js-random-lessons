@@ -10,6 +10,8 @@ const express_1 = __importDefault(require("express"));
 const books_routes_1 = require("./routes/books-routes");
 const tests_routes_1 = require("./routes/tests-routes");
 const mainpage_routes_1 = require("./routes/mainpage-routes");
+const users_routes_1 = require("./routes/users-routes");
+const auth_router_1 = require("./routes/auth/auth-router");
 /*Создаем приложение на Express.*/
 exports.app = (0, express_1.default)();
 /*Подключаем специальный middleware из Express. Он позволит нам работать с body для отправки данных на сервер. Нужно
@@ -29,3 +31,5 @@ exports.app.use('/__test__', (0, tests_routes_1.getTestsRouter)());
 exports.app.use('/', (0, mainpage_routes_1.getMainPageRouter)());
 exports.app.use('/interesting', (0, books_routes_1.getInterestingRouter)());
 exports.app.use('/authors', (0, books_routes_1.getAuthorsRouter)());
+exports.app.use('/registration', users_routes_1.usersRouter);
+exports.app.use('/login', auth_router_1.authRouter);
