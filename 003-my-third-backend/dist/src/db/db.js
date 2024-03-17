@@ -15,7 +15,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.db = exports.usersCollection = exports.mainPageContentCollection = exports.booksCollection = exports.runDB = void 0;
+exports.db = exports.feedbacksCollection = exports.usersCollection = exports.mainPageContentCollection = exports.booksCollection = exports.runDB = void 0;
 /*
 Создание документов в коллекции в БД для MongoDB:
 db.getCollection('books').insertMany(
@@ -57,15 +57,24 @@ db.getCollection('users').insertMany(
     ]
 )
 
+db.getCollection('feedbacks').insertMany(
+    [
+        {_id: new ObjectId, userID: new ObjectId, bookID: 1, comment: 'not OK', createdAt: ''},
+        {_id: new ObjectId, userID: new ObjectId, bookID: 2, comment: 'fine', createdAt: ''},
+    ]
+)
+
 Проверка создания документов в коллекции в БД для MongoDB:
 db.getCollection('books').find({})
 db.getCollection('mainpage').find({})
 db.getCollection('users').find({})
+db.getCollection('feedbacks').find({})
 
 Очистка документов в коллекции в БД для MongoDB:
 db.getCollection('books').deleteMany({})
 db.getCollection('mainpage').deleteMany({})
 db.getCollection('users').deleteMany({})
+db.getCollection('feedbacks').deleteMany({})
 */
 const mongodb_1 = require("mongodb");
 /*Делаем так, чтобы URI определялся автоматически от окружения.*/
@@ -95,6 +104,7 @@ const remoteDB = client.db('bookshop');
 exports.booksCollection = remoteDB.collection('books');
 exports.mainPageContentCollection = remoteDB.collection('mainpage');
 exports.usersCollection = remoteDB.collection('users');
+exports.feedbacksCollection = remoteDB.collection('feedbacks');
 exports.db = {
     mainPageContent: { content: '<h1>Hello!</h1>' },
     books: [
@@ -107,5 +117,9 @@ exports.db = {
         { _id: new mongodb_1.ObjectId, userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: new Date() },
         { _id: new mongodb_1.ObjectId, userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: new Date() },
         { _id: new mongodb_1.ObjectId, userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: new Date() },
+    ],
+    feedbacks: [
+        { _id: new mongodb_1.ObjectId, userID: new mongodb_1.ObjectId, bookID: 1, comment: 'not OK', createdAt: new Date() },
+        { _id: new mongodb_1.ObjectId, userID: new mongodb_1.ObjectId, bookID: 2, comment: 'fine', createdAt: new Date() }
     ]
 };

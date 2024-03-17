@@ -18,11 +18,13 @@ exports.authRouter = (0, express_1.Router)({});
 exports.authRouter.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     /*Отправляем данные на BLL уровень.*/
     const user = yield users_service_1.usersService.checkCredentials(req.body.loginOrEmail, req.body.password);
+    /*При нахождении пользователя пытаемся создать для него токен.*/
     if (user) {
         /*Создаем токен.*/
         const token = yield jwt_service_1.jwtService.createJWT(user);
         /*Отправляем токен клиенту.*/
         res.status(201).send({ message: 'Access granted', token: token });
+        // res.status(201).send(token);
     }
     else {
         res.status(401).send({ message: 'Access denied' });

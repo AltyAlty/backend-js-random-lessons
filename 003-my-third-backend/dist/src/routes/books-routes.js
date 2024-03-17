@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAuthorsRouter = exports.requestCounterMiddleware = exports.authGuardMiddleware = exports.uselessMiddleware = exports.getInterestingRouter = exports.getBooksRouter = void 0;
 /*В целях типизации импортируем Response из Express.*/
 const express_1 = __importDefault(require("express"));
-const utils_1 = require("../utils");
+const utils_1 = require("../utils/utils");
 const books_service_1 = require("../domain/books-service");
 const books_middlewares_1 = require("../middlewares/books-middlewares");
 const getBooksRouter = () => {

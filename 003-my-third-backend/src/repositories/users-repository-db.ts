@@ -1,6 +1,5 @@
 import {ObjectId} from 'mongodb';
-import {UserDBType} from '../types';
-import {usersCollection} from '../db/db';
+import {UserDBType, usersCollection} from '../db/db';
 
 export const usersRepository = {
     /*Поиск всех пользователей на DAL уровне.*/
@@ -14,7 +13,6 @@ export const usersRepository = {
     /*Создание нового пользователя на DAL уровне.*/
     async createUser(user: UserDBType): Promise<UserDBType> {
         const result = await usersCollection.insertOne(user);
-        console.log('DAL' + result);
         return user;
     },
 

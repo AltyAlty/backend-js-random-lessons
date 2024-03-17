@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getTestsRouter = void 0;
 const express_1 = __importDefault(require("express"));
-const utils_1 = require("../utils");
+const utils_1 = require("../utils/utils");
 /*Импортируем ДБ.*/
 const db_1 = require("../db/db");
 const getTestsRouter = () => {

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /*Импортируем библиотеку "request", которая позволяет делать запросы к серверу. supertest сам поднимет наш сервер во
 время тестирования.*/
 const supertest_1 = __importDefault(require("supertest"));
-const utils_1 = require("../../src/utils");
+const utils_1 = require("../../src/utils/utils");
 const app_1 = require("../../src/app");
 /*Это тесты для локальной версии БД.*/
 describe('/page-one', () => {

@@ -1,6 +1,6 @@
 /*В целях типизации импортируем Response из Express.*/
 import express, {NextFunction, Request, Response} from 'express';
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from '../types';
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from '../types/types';
 import {GetQueryBooksModel} from '../models/GetQueryBooksModel';
 import {BookViewModel} from '../models/BookViewModel';
 import {GetURIParamsIDBookModel} from '../models/GetURIParamsIDBookModel';
@@ -8,7 +8,7 @@ import {CreateBookModel} from '../models/CreateBookModel';
 import {DeleteURIParamsIDBookModel} from '../models/DeleteURIParamsIDBookModel';
 import {UpdateURIParamsIDBookModel} from '../models/UpdateURIParamsIDBookModel';
 import {UpdateBookModel} from '../models/UpdateBookModel';
-import {HTTP_STATUSES} from '../utils';
+import {HTTP_STATUSES} from '../utils/utils';
 import {booksService} from '../domain/books-service';
 import {
     titleIsNotEmptyValidationMiddleware,

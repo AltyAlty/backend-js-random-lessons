@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.titleValidationMiddleware = exports.titleIsOfCorrectLengthValidationMiddleware = exports.titleIsNotEmptyValidationMiddleware = void 0;
 const express_validator_1 = require("express-validator");
-const utils_1 = require("../utils");
+const utils_1 = require("../utils/utils");
 /*Используем здесь middleware "body" из библиотеки "express-validator", чтобы проверить наличие "title" и
 установить для него ограничения.*/
 exports.titleIsNotEmptyValidationMiddleware = (0, express_validator_1.body)('title')

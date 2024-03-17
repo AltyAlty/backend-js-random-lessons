@@ -16,8 +16,9 @@ exports.usersRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const users_service_1 = require("../domain/users-service");
 exports.usersRouter = express_1.default.Router();
-/*Создание нового пользователя на UI уровне.*/
-exports.usersRouter.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.usersRouter
+    /*Создание нового пользователя на UI уровне.*/
+    .post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     /*Отправляем данные на BLL уровень.*/
     const newUser = yield users_service_1.usersService.createUser(req.body.login, req.body.email, req.body.password);
     res.status(201).send(newUser);

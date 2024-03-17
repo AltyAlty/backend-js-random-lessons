@@ -46,18 +46,26 @@ db.getCollection('users').insertMany(
     ]
 )
 
+db.getCollection('feedbacks').insertMany(
+    [
+        {_id: new ObjectId, userID: new ObjectId, bookID: 1, comment: 'not OK', createdAt: ''},
+        {_id: new ObjectId, userID: new ObjectId, bookID: 2, comment: 'fine', createdAt: ''},
+    ]
+)
+
 Проверка создания документов в коллекции в БД для MongoDB:
 db.getCollection('books').find({})
 db.getCollection('mainpage').find({})
 db.getCollection('users').find({})
+db.getCollection('feedbacks').find({})
 
 Очистка документов в коллекции в БД для MongoDB:
 db.getCollection('books').deleteMany({})
 db.getCollection('mainpage').deleteMany({})
 db.getCollection('users').deleteMany({})
+db.getCollection('feedbacks').deleteMany({})
 */
 import {MongoClient, ObjectId} from 'mongodb';
-import {UserDBType} from '../types';
 
 /*Делаем так, чтобы URI определялся автоматически от окружения.*/
 const mongoURI = process.env.mongoURI || 'mongodb://0.0.0.0:27017';
@@ -83,6 +91,7 @@ const remoteDB = client.db('bookshop');
 export const booksCollection = remoteDB.collection<BookType>('books');
 export const mainPageContentCollection = remoteDB.collection('mainpage');
 export const usersCollection = remoteDB.collection<UserDBType>('users');
+export const feedbacksCollection = remoteDB.collection<FeedbackDBType>('feedbacks');
 
 export type BookType = {
     id: number
@@ -92,10 +101,29 @@ export type BookType = {
 
 export type mainPageContentType = { content: string };
 
+export type UserDBType = {
+    _id: ObjectId,
+    userName: string,
+    email: string,
+    passwordHash: string,
+    passwordSalt: string,
+    createdAt: Date
+};
+
+export type FeedbackDBType = {
+    _id: ObjectId,
+    userID: ObjectId,
+    bookID: number,
+    comment: string
+    createdAt: Date
+}
+
+
 export type DBType = {
     mainPageContent: mainPageContentType
     books: BookType[]
     users: UserDBType[]
+    feedbacks: FeedbackDBType[]
 };
 
 export const db: DBType = {
@@ -112,5 +140,10 @@ export const db: DBType = {
         {_id: new ObjectId, userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: new Date()},
         {_id: new ObjectId, userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: new Date()},
         {_id: new ObjectId, userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: new Date()},
+    ],
+
+    feedbacks: [
+        {_id: new ObjectId, userID: new ObjectId, bookID: 1, comment: 'not OK', createdAt: new Date()},
+        {_id: new ObjectId, userID: new ObjectId, bookID: 2, comment: 'fine', createdAt: new Date()}
     ]
 };

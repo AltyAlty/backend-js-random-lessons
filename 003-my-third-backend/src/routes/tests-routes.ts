@@ -1,5 +1,5 @@
 import express from 'express';
-import {HTTP_STATUSES} from '../utils';
+import {HTTP_STATUSES} from '../utils/utils';
 /*Импортируем ДБ.*/
 import {db} from '../db/db';
 

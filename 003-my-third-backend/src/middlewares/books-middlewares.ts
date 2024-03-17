@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from 'express';
 import {body, validationResult} from 'express-validator';
-import {HTTP_STATUSES} from '../utils';
+import {HTTP_STATUSES} from '../utils/utils';
 
 /*Используем здесь middleware "body" из библиотеки "express-validator", чтобы проверить наличие "title" и
 установить для него ограничения.*/

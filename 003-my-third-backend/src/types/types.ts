@@ -1,6 +1,5 @@
 /*В целях типизации импортируем Request.*/
 import {Request} from 'express';
-import {ObjectId} from 'mongodb';
 
 /*Делаем более удобные типы для запросов. Сначала сделаем тип, где указываем URI-параметры в GET-запросе. При типизации
 запроса "req" на первом месте идут URI-параметры, мы их не указываем, так как не используем URI-параметры. На втором
@@ -15,12 +14,3 @@ export type RequestWithParams<T> = Request<T>;
 export type RequestWithBody<T> = Request<{}, {}, T>;
 
 export type RequestWithParamsAndBody<T, B> = Request<T, {}, B>;
-
-export type UserDBType = {
-    _id: ObjectId,
-    userName: string,
-    email: string,
-    passwordHash: string,
-    passwordSalt: string,
-    createdAt: Date
-}

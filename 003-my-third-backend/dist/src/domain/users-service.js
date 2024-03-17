@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersService = void 0;
-const users_repository_1 = require("../repositories/users-repository");
+const users_repository_db_1 = require("../repositories/users-repository-db");
 const mongodb_1 = require("mongodb");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 exports.usersService = {
@@ -32,20 +32,20 @@ exports.usersService = {
                 passwordSalt: passwordSalt,
                 createdAt: new Date()
             };
-            return users_repository_1.usersRepository.createUser(newUser); // Отправляем данные на DAL уровень.
+            return users_repository_db_1.usersRepository.createUser(newUser); // Отправляем данные на DAL уровень.
         });
     },
     /*Поиск пользователя по ID на BLL уровне.*/
     findUserByID(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return users_repository_1.usersRepository.findUserByID(id);
+            return users_repository_db_1.usersRepository.findUserByID(id);
         });
     },
     /*Логинизация пользователя на BLL уровне.*/
     checkCredentials(loginOrEmail, password) {
         return __awaiter(this, void 0, void 0, function* () {
             /*Ищем в БД пользователя на уровне DAL.*/
-            const user = yield users_repository_1.usersRepository.findByLoginOrEmail(loginOrEmail);
+            const user = yield users_repository_db_1.usersRepository.findByLoginOrEmail(loginOrEmail);
             /*Если пользователя нет, то отказываем в логинизации.*/
             if (!user)
                 return false;
@@ -55,7 +55,7 @@ exports.usersService = {
             if (user.passwordHash !== passwordHash)
                 return false;
             /*Если же сгенерированный хэш совпадает с хэшем из БД, то разрешаем логинизацию.*/
-            return true;
+            return user;
         });
     },
     /*Генерация хэша для пароля.*/

@@ -3,7 +3,7 @@
 import request from 'supertest';
 import {CreateBookModel} from '../../src/models/CreateBookModel';
 import {UpdateBookModel} from '../../src/models/UpdateBookModel';
-import {HTTP_STATUSES} from '../../src/utils';
+import {HTTP_STATUSES} from '../../src/utils/utils';
 import {app} from '../../src/app';
 
 /*Это тесты для локальной версии БД.*/

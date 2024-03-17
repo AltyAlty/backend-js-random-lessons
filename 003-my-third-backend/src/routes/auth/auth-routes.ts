@@ -1,5 +1,6 @@
 import {Request, Response, Router} from 'express';
 import {usersService} from '../../domain/users-service';
+import {jwtService} from '../../application/jwt-service';
 
 export const authRouter = Router({});
 
@@ -7,10 +8,15 @@ export const authRouter = Router({});
 authRouter.post('/',
     async (req: Request, res: Response) => {
         /*Отправляем данные на BLL уровень.*/
-        const result = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password);
+        const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password);
 
-        if (result) {
-            res.status(201).send({message: 'Access granted'});
+        /*При нахождении пользователя пытаемся создать для него токен.*/
+        if (user) {
+            /*Создаем токен.*/
+            const token = await jwtService.createJWT(user);
+            /*Отправляем токен клиенту.*/
+            res.status(201).send({message: 'Access granted', token: token});
+            // res.status(201).send(token);
         } else {
             res.status(401).send({message: 'Access denied'});
         }

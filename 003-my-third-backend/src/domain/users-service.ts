@@ -1,7 +1,7 @@
-import {usersRepository} from '../repositories/users-repository';
-import {UserDBType} from '../types';
+import {usersRepository} from '../repositories/users-repository-db';
 import {ObjectId} from 'mongodb';
 import bcrypt from 'bcrypt';
+import {UserDBType} from '../db/db';
 
 export const usersService = {
     /*Создание нового пользователя на BLL уровне.*/
@@ -39,7 +39,7 @@ export const usersService = {
         /*Если сгенерированный хэш не совпадает с хэшем из БД, то отказываем в логинизации.*/
         if (user.passwordHash !== passwordHash) return false;
         /*Если же сгенерированный хэш совпадает с хэшем из БД, то разрешаем логинизацию.*/
-        return true;
+        return user;
     },
 
     /*Генерация хэша для пароля.*/
