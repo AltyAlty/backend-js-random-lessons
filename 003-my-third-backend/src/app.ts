@@ -13,6 +13,7 @@ import {getMainPageRouter} from './routes/mainpage-routes';
 import {usersRouter} from './routes/users-routes';
 import {authRouter} from './routes/auth/auth-routes';
 import {feedbacksRouter} from './routes/feedbacks-routes';
+import {emailRouter} from './routes/email-router';
 
 /*Создаем приложение на Express.*/
 export const app = express();
@@ -39,3 +40,4 @@ app.use('/authors', getAuthorsRouter());
 app.use('/registration', usersRouter);
 app.use('/login', authRouter);
 app.use('/feedback', feedbacksRouter);
+app.use('/email', emailRouter);
