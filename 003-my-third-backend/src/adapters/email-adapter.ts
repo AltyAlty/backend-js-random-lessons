@@ -10,8 +10,8 @@ export const emailAdapter = {
             // port: 587,
             // secure: false, // Use `true` for port 465, `false` for all other ports
             auth: {
-                user: "heneveraskedforthis@gmail.com", // Ваша почта.
-                pass: "zayk eovs taom dkzt ", // Пароль приложения из google.
+                user: "youremail@gmail.com", // Ваша почта.
+                pass: "aaaa aaaa aaaa aaaa ", // Пароль приложения из google.
             },
         });
 
