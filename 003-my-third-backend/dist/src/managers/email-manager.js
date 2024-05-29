@@ -22,5 +22,10 @@ exports.emailManager = {
         return __awaiter(this, void 0, void 0, function* () {
             yield email_adapter_1.emailAdapter.sendEmail(email, 'Password Recovery', `<div>Your new password: ${newPassword}</div>`);
         });
-    }
+    },
+    sendEmailConfirmationMessage(user) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield email_adapter_1.emailAdapter.sendEmail(user.email, 'Email Confirmation', `<div>Your confirmation code: ${user.emailConfirmation.confirmationCode}</div>`);
+        });
+    },
 };

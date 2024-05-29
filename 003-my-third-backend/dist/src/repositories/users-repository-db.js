@@ -46,5 +46,12 @@ exports.usersRepository = {
             const user = yield db_1.usersCollection.findOne({ $or: [{ email: loginOrEmail }, { userName: loginOrEmail }] });
             return user;
         });
+    },
+    /*Подтверждение почты пользователя на DAL уровне.*/
+    updateConfirmation(userID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result = yield db_1.usersCollection.updateOne({ _id: userID }, { $set: { 'emailConfirmation.isConfirmed': true } });
+            return result.modifiedCount === 1;
+        });
     }
 };

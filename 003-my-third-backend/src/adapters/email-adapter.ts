@@ -17,7 +17,7 @@ export const emailAdapter = {
 
         // send mail with defined transport object
         const info = await transporter.sendMail({
-            from: '"Adam Jensen" <heneveraskedforthis@gmail.com>', // sender address
+            from: '"Adam Jensen" <youremail@gmail.com>', // sender address
             to: email, // list of receivers
             subject: subject, // Subject line
             // text: "Did you ever ask for this?", // plain text body

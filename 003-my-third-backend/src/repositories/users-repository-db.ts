@@ -31,5 +31,11 @@ export const usersRepository = {
     async findByLoginOrEmail(loginOrEmail: string) {
         const user = await usersCollection.findOne({$or: [{email: loginOrEmail}, {userName: loginOrEmail}]});
         return user;
+    },
+
+    /*Подтверждение почты пользователя на DAL уровне.*/
+    async updateConfirmation(userID: ObjectId): Promise<boolean> {
+        let result = await usersCollection.updateOne({_id: userID}, {$set: {'emailConfirmation.isConfirmed': true}});
+        return result.modifiedCount === 1;
     }
 };

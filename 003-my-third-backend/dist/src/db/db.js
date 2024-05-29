@@ -51,9 +51,23 @@ db.getCollection('mainpage').insertMany(
 
 db.getCollection('users').insertMany(
     [
-        {userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: ''},
-        {userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: ''},
-        {userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: ''},
+        {userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: '', emailConfirmation: {
+                confirmationCode: '',
+                expirationDate: '',
+                isConfirmed: true,
+            }},
+
+        {userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: '', emailConfirmation: {
+                confirmationCode: '',
+                expirationDate: '',
+                isConfirmed: true,
+            }},
+
+        {userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: '', emailConfirmation: {
+                confirmationCode: '',
+                expirationDate: '',
+                isConfirmed: true,
+            }},
     ]
 )
 
@@ -114,9 +128,45 @@ exports.db = {
         { id: 4, title: 'book-four', customersCount: 8 }
     ],
     users: [
-        { _id: new mongodb_1.ObjectId, userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: new Date() },
-        { _id: new mongodb_1.ObjectId, userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: new Date() },
-        { _id: new mongodb_1.ObjectId, userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: new Date() },
+        {
+            _id: new mongodb_1.ObjectId,
+            userName: 'aaa',
+            email: 'a',
+            passwordHash: '',
+            passwordSalt: '',
+            createdAt: new Date(),
+            emailConfirmation: {
+                confirmationCode: (+(new Date())).toString(),
+                expirationDate: new Date(new Date().getTime() + (3 * 60 * 1000)),
+                isConfirmed: true,
+            }
+        },
+        {
+            _id: new mongodb_1.ObjectId,
+            userName: 'bbb',
+            email: 'b',
+            passwordHash: '',
+            passwordSalt: '',
+            createdAt: new Date(),
+            emailConfirmation: {
+                confirmationCode: (+(new Date())).toString(),
+                expirationDate: new Date(new Date().getTime() + (3 * 60 * 1000)),
+                isConfirmed: true,
+            }
+        },
+        {
+            _id: new mongodb_1.ObjectId,
+            userName: 'ccc',
+            email: 'c',
+            passwordHash: '',
+            passwordSalt: '',
+            createdAt: new Date(),
+            emailConfirmation: {
+                confirmationCode: (+(new Date())).toString(),
+                expirationDate: new Date(new Date().getTime() + (3 * 60 * 1000)),
+                isConfirmed: true,
+            }
+        },
     ],
     feedbacks: [
         { _id: new mongodb_1.ObjectId, userID: new mongodb_1.ObjectId, bookID: 1, comment: 'not OK', createdAt: new Date() },

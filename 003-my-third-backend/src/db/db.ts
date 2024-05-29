@@ -40,9 +40,23 @@ db.getCollection('mainpage').insertMany(
 
 db.getCollection('users').insertMany(
     [
-        {userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: ''},
-        {userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: ''},
-        {userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: ''},
+        {userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: '', emailConfirmation: {
+                confirmationCode: '',
+                expirationDate: '',
+                isConfirmed: true,
+            }},
+
+        {userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: '', emailConfirmation: {
+                confirmationCode: '',
+                expirationDate: '',
+                isConfirmed: true,
+            }},
+
+        {userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: '', emailConfirmation: {
+                confirmationCode: '',
+                expirationDate: '',
+                isConfirmed: true,
+            }},
     ]
 )
 
@@ -107,7 +121,12 @@ export type UserDBType = {
     email: string,
     passwordHash: string,
     passwordSalt: string,
-    createdAt: Date
+    createdAt: Date,
+    emailConfirmation: {
+        confirmationCode: string,
+        expirationDate: Date,
+        isConfirmed: boolean,
+    }
 };
 
 export type FeedbackDBType = {
@@ -116,8 +135,7 @@ export type FeedbackDBType = {
     bookID: number,
     comment: string
     createdAt: Date
-}
-
+};
 
 export type DBType = {
     mainPageContent: mainPageContentType
@@ -137,9 +155,47 @@ export const db: DBType = {
     ],
 
     users: [
-        {_id: new ObjectId, userName: 'aaa', email: 'a', passwordHash: '', passwordSalt: '', createdAt: new Date()},
-        {_id: new ObjectId, userName: 'bbb', email: 'b', passwordHash: '', passwordSalt: '', createdAt: new Date()},
-        {_id: new ObjectId, userName: 'ccc', email: 'c', passwordHash: '', passwordSalt: '', createdAt: new Date()},
+        {
+            _id: new ObjectId,
+            userName: 'aaa',
+            email: 'a',
+            passwordHash: '',
+            passwordSalt: '',
+            createdAt: new Date(),
+            emailConfirmation: {
+                confirmationCode: (+(new Date())).toString(),
+                expirationDate: new Date(new Date().getTime() + (3 * 60 * 1000)),
+                isConfirmed: true,
+            }
+        },
+
+        {
+            _id: new ObjectId,
+            userName: 'bbb',
+            email: 'b',
+            passwordHash: '',
+            passwordSalt: '',
+            createdAt: new Date(),
+            emailConfirmation: {
+                confirmationCode: (+(new Date())).toString(),
+                expirationDate: new Date(new Date().getTime() + (3 * 60 * 1000)),
+                isConfirmed: true,
+            }
+        },
+
+        {
+            _id: new ObjectId,
+            userName: 'ccc',
+            email: 'c',
+            passwordHash: '',
+            passwordSalt: '',
+            createdAt: new Date(),
+            emailConfirmation: {
+                confirmationCode: (+(new Date())).toString(),
+                expirationDate: new Date(new Date().getTime() + (3 * 60 * 1000)),
+                isConfirmed: true,
+            }
+        },
     ],
 
     feedbacks: [

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.businessService = void 0;
 const email_manager_1 = require("../managers/email-manager");
 exports.businessService = {
+    /*Отправление писем на BLL уровне.*/
     doEmailOperation(email, subject, message, operationType) {
         return __awaiter(this, void 0, void 0, function* () {
             switch (operationType) {

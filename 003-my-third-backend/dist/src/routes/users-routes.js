@@ -12,22 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.usersRouter = void 0;
+exports.getUsersRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const users_service_1 = require("../domain/users-service");
-exports.usersRouter = express_1.default.Router();
-exports.usersRouter
+const getUsersRouter = () => {
+    const router = express_1.default.Router();
     /*Создание нового пользователя на UI уровне.*/
-    .post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    /*Отправляем данные на BLL уровень.*/
-    const newUser = yield users_service_1.usersService.createUser(req.body.login, req.body.email, req.body.password);
-    res.status(201).send(newUser);
-    /*В консоли можно использовать такую команду:
-        fetch('http://localhost:3000/registration', {method: 'POST', body: JSON.stringify({login: 'ddd', email: 'd', password: 'd4'}),
-        headers: {
-            'content-type': 'application/json'
-        }})
-            .then(res => res.json())
-            .then(json => console.log(json))
-    */
-}));
+    router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        /*Отправляем данные на BLL уровень.*/
+        const newUser = yield users_service_1.usersService.createUser(req.body.login, req.body.email, req.body.password);
+        if (newUser) {
+            res.status(201).send(newUser);
+        }
+        /*В консоли можно использовать такую команду:
+            fetch('http://localhost:3000/registration', {method: 'POST', body: JSON.stringify({login: 'ddd', email: 'jiramanager03@mail.ru', password: 'd4'}),
+            headers: {
+                'content-type': 'application/json'
+            }})
+                .then(res => res.json())
+                .then(json => console.log(json))
+        */
+    }));
+    return router;
+};
+exports.getUsersRouter = getUsersRouter;

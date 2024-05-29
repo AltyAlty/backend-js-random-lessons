@@ -16,6 +16,7 @@ exports.usersService = void 0;
 const users_repository_db_1 = require("../repositories/users-repository-db");
 const mongodb_1 = require("mongodb");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const email_manager_1 = require("../managers/email-manager");
 exports.usersService = {
     /*Создание нового пользователя на BLL уровне.*/
     createUser(login, email, password) {
@@ -30,8 +31,14 @@ exports.usersService = {
                 email: email,
                 passwordHash: passwordHash,
                 passwordSalt: passwordSalt,
-                createdAt: new Date()
+                createdAt: new Date(),
+                emailConfirmation: {
+                    confirmationCode: (+(new Date())).toString(),
+                    expirationDate: new Date(new Date().getTime() + (10 * 60 * 1000)),
+                    isConfirmed: false, // Подтверждена ли почта.
+                }
             };
+            yield email_manager_1.emailManager.sendEmailConfirmationMessage(newUser); // Отправляем письмо для подтверждения.
             return users_repository_db_1.usersRepository.createUser(newUser); // Отправляем данные на DAL уровень.
         });
     },
@@ -47,7 +54,7 @@ exports.usersService = {
             /*Ищем в БД пользователя на уровне DAL.*/
             const user = yield users_repository_db_1.usersRepository.findByLoginOrEmail(loginOrEmail);
             /*Если пользователя нет, то отказываем в логинизации.*/
-            if (!user)
+            if (!user || !user.emailConfirmation.isConfirmed)
                 return false;
             /*Если пользователь есть в БД, то генерируем хэш.*/
             const passwordHash = yield this._generateHash(password, user.passwordSalt);

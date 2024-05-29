@@ -1,10 +1,11 @@
-import {Request, Response, Router} from 'express';
+import express, {Request, Response, Router} from 'express';
 import {businessService} from '../domain/business-service';
 
-export const emailRouter = Router({});
+export const getEmailRouter = () => {
+    const router = express.Router();
 
-emailRouter
-    .post('/send', async (req: Request, res: Response) => {
+    /*Отправление писем на UI уровне.*/
+    router.post('/send', async (req: Request, res: Response) => {
         await businessService.doEmailOperation(req.body.email, req.body.subject, req.body.message, req.body.operationType);
 
         res.send({
@@ -32,3 +33,6 @@ emailRouter
                 .then(json => console.log(json))
         */
     });
+
+    return router;
+};

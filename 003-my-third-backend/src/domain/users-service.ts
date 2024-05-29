@@ -2,6 +2,7 @@ import {usersRepository} from '../repositories/users-repository-db';
 import {ObjectId} from 'mongodb';
 import bcrypt from 'bcrypt';
 import {UserDBType} from '../db/db';
+import {emailManager} from '../managers/email-manager';
 
 export const usersService = {
     /*Создание нового пользователя на BLL уровне.*/
@@ -17,9 +18,15 @@ export const usersService = {
             email: email,
             passwordHash: passwordHash,
             passwordSalt: passwordSalt, // На самом деле лучше соль не сохранять, так как она содержится в хэше.
-            createdAt: new Date()
+            createdAt: new Date(),
+            emailConfirmation: {
+                confirmationCode: (+(new Date())).toString(), // Код подтверждения почты.
+                expirationDate: new Date(new Date().getTime() + (10 * 60 * 1000)), // Дата истечения кода.
+                isConfirmed: false, // Подтверждена ли почта.
+            }
         };
 
+        await emailManager.sendEmailConfirmationMessage(newUser); // Отправляем письмо для подтверждения.
         return usersRepository.createUser(newUser); // Отправляем данные на DAL уровень.
     },
 
@@ -33,7 +40,7 @@ export const usersService = {
         /*Ищем в БД пользователя на уровне DAL.*/
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail);
         /*Если пользователя нет, то отказываем в логинизации.*/
-        if (!user) return false;
+        if (!user || !user.emailConfirmation.isConfirmed) return false;
         /*Если пользователь есть в БД, то генерируем хэш.*/
         const passwordHash = await this._generateHash(password, user.passwordSalt);
         /*Если сгенерированный хэш не совпадает с хэшем из БД, то отказываем в логинизации.*/

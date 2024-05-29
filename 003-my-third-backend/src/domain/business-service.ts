@@ -1,6 +1,7 @@
 import {emailManager} from '../managers/email-manager';
 
 export const businessService = {
+    /*Отправление писем на BLL уровне.*/
     async doEmailOperation(email: string, subject: string, message: string, operationType: string) {
         switch (operationType) {
             case 'regular email': {

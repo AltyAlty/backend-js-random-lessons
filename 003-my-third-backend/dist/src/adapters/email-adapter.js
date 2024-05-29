@@ -25,13 +25,13 @@ exports.emailAdapter = {
                 // port: 587,
                 // secure: false, // Use `true` for port 465, `false` for all other ports
                 auth: {
-                    user: "heneveraskedforthis@gmail.com",
-                    pass: "zayk eovs taom dkzt ", // Пароль приложения из google.
+                    user: "youremail@gmail.com",
+                    pass: "aaaa aaaa aaaa aaaa ", // Пароль приложения из google.
                 },
             });
             // send mail with defined transport object
             const info = yield transporter.sendMail({
-                from: '"Adam Jensen" <heneveraskedforthis@gmail.com>',
+                from: '"Adam Jensen" <youremail@gmail.com>',
                 to: email,
                 subject: subject,
                 // text: "Did you ever ask for this?", // plain text body
