@@ -100,6 +100,8 @@ https://www.nodemailer.com/usage/using-gmail/
 yarn add nodemailer
 Для установки типов для этой библиотеки используем:
 yarn add -D @types/nodemailer
+
+
 */
 
 /*Этот файл "index.ts" служит главной точкой входа в приложении, поэтому здесь просто подключается "app" и происходит
