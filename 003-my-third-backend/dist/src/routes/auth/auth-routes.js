@@ -13,23 +13,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAuthRouter = void 0;
+/*Импортируем express для создания роутеров. Импортируем Request и Response из Express для типизации.*/
 const express_1 = __importDefault(require("express"));
+/*Импортируем сервисы.*/
 const users_service_1 = require("../../domain/users-service");
 const jwt_service_1 = require("../../application/jwt-service");
 const auth_service_1 = require("../../domain/auth/auth-service");
+/*Создаем функцию "getAuthRouter()" для создания роутинга для аутентификации пользователей.*/
 const getAuthRouter = () => {
+    /*Создаем роутер из Express.*/
     const router = express_1.default.Router();
-    /*Логинизация пользователя на UI уровне.*/
+    /*Конфигурируем POST-запросы для логинизации пользователей по логину/почте и паролю.*/
     router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         /*Отправляем данные на BLL уровень.*/
+        /*Просим сервис "usersService" проверить учетные данные пользователя.*/
         const user = yield users_service_1.usersService.checkCredentials(req.body.loginOrEmail, req.body.password);
-        /*При нахождении пользователя пытаемся создать для него токен.*/
+        /*Если нет проблем с учетными данными пользователя, то создаем для него JWT-токен, иначе сообщаем клиенту об
+        отказе в логинизации.*/
         if (user) {
-            /*Создаем токен.*/
+            /*Создаем JWT-токен.*/
             const token = yield jwt_service_1.jwtService.createJWT(user);
-            /*Отправляем токен клиенту.*/
+            /*Отправляем JWT-токен клиенту.*/
             res.status(201).send({ message: 'Access granted', token: token });
-            // res.status(201).send(token);
         }
         else {
             res.status(401).send({ message: 'Access denied' });

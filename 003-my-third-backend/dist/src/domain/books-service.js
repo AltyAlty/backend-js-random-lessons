@@ -9,51 +9,116 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.booksService = exports.mapDBBookToViewModel = void 0;
-const books_repository_db_1 = require("../repositories/books-repository-db");
-// import {booksRepository} from '../repositories/books-repository-local'
-const mapDBBookToViewModel = (book) => {
+exports.booksService = exports.mapBookDBTypeToViewModel = void 0;
+/*Импортируем репозитории.*/
+const books_repository_db_mongo_1 = require("../repositories/mongo/books-repository-db-mongo");
+/*Создаем вспомогательную функцию "mapDBBookToViewModel()" для преобразования объектов типа "BookDBType" в объекты типа
+"BookViewModel".*/
+const mapBookDBTypeToViewModel = (book) => {
     return {
         id: book.id,
         title: book.title
     };
 };
-exports.mapDBBookToViewModel = mapDBBookToViewModel;
-/*Здесь используется "db" только, чтобы была возможность быстро переключиться на "local" версию репозитория.*/
+exports.mapBookDBTypeToViewModel = mapBookDBTypeToViewModel;
+/*Создаем сервис "booksService" для работы с данными по книгам.*/
 exports.booksService = {
-    /*Используем "async", чтобы то, что возвращается функцией, обворачивалось в промис.*/
+    /*Создаем метод "findBooksByTitle()" для поиска книг по названию.*/
     findBooksByTitle(title) {
         return __awaiter(this, void 0, void 0, function* () {
-            return books_repository_db_1.booksRepository.findBooksByTitle(title);
+            /*Просим репозиторий "booksRepository" найти книги по названию. Порядок работы такой:
+            1. Если сервер Mongo БД работает и:
+            1.1 по параметру "title" были найдены книги - возвращается массив с найденными книгами в UI.
+            1.2 по параметру "title" не были найдены книги - возвращается null в UI.
+            1.3 параметр "title" не был указан - возвращается массив со всеми книгами в UI.
+            2. Если сервер Mongo БД не работает - возвращается ошибка в UI.*/
+            try {
+                return books_repository_db_mongo_1.booksRepository.findBooksByTitle(title);
+            }
+            catch (error) {
+                throw error;
+            }
         });
     },
+    /*Создаем метод "findBookByID()" для поиска книги по ID.*/
     findBookByID(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return books_repository_db_1.booksRepository.findBookByID(id);
+            /*Просим репозиторий "booksRepository" найти книгу по ID. Порядок работы такой:
+            1. Если сервер Mongo БД работает и:
+            1.1 книга была найдена - возвращаются данные по найденной книге в UI.
+            1.2 книга не была найдена - возвращается null в UI.
+            2. Если сервер Mongo БД не работает - возвращается ошибка в UI.*/
+            try {
+                return books_repository_db_mongo_1.booksRepository.findBookByID(id);
+            }
+            catch (error) {
+                throw error;
+            }
         });
     },
+    /*Создаем метод "createBookWithTitle()" для создания книги с указанным названием.*/
     createBookWithTitle(title) {
         return __awaiter(this, void 0, void 0, function* () {
+            /*Если названия для создания книги не было указано, то возвращается false в UI.*/
+            if (!title)
+                return false;
+            /*Формируем объект для новой книги с указанным названием.*/
             const newBook = {
-                /*"+(new Date())" - таким образом генерируем случайно число. На самом деле генерация новых id это задача
-                сервера, то есть клиент не должен их сам указывать при создании нового ресурса.*/
+                /*При помощи "+(new Date())" генерируем "случайное" ID. Но генерация ID должна быть задачей сервера.*/
                 id: +(new Date()),
-                /*Если какое-то свойство в объекте undefined, то при переводе его в JSON оно отбрасывается.*/
+                /*Если некое свойство является undefined, то при переводе в JSON это свойство отбрасывается.*/
                 title: title,
                 customersCount: 0
             };
-            const result = yield books_repository_db_1.booksRepository.createBookWithTitle(newBook);
-            return ((0, exports.mapDBBookToViewModel)(newBook));
+            /*Просим репозиторий "booksRepository" создать новую книгу с указанным названием. Порядок работы такой:
+            1. Если сервер Mongo БД работает и:
+            1.1 книга была добавлена - возвращается true в UI.
+            1.2 книга не была добавлена - возвращается false в UI.
+            2. Если сервер Mongo БД не работает - возвращается ошибка в UI.*/
+            try {
+                return yield books_repository_db_mongo_1.booksRepository.createBookWithTitle(newBook);
+            }
+            catch (error) {
+                throw error;
+            }
         });
     },
+    /*Создаем метод "deleteBookByID()" для удаления книги по ID.*/
     deleteBookByID(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield books_repository_db_1.booksRepository.deleteBookByID(id);
+            /*Если ID книги для удаления не было указано, то возвращается false в UI.*/
+            if (!id)
+                return false;
+            /*Просим репозиторий "booksRepository" удалить книгу по ID. Порядок работы такой:
+            1. Если сервер Mongo БД работает и:
+            1.1 книга была удалена - возвращается true в UI.
+            1.2 книга не была удалена - возвращается false в UI.
+            2. Если сервер Mongo БД не работает - возвращается ошибка в UI.*/
+            try {
+                return yield books_repository_db_mongo_1.booksRepository.deleteBookByID(id);
+            }
+            catch (error) {
+                throw error;
+            }
         });
     },
+    /*Создаем метод "updateBookTitleByID()" для обновления названия книги по ID.*/
     updateBookTitleByID(title, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield books_repository_db_1.booksRepository.updateBookTitleByID(title, id);
+            /*Если названия или ID книги для удаления не было указано, то возвращается false в UI.*/
+            if (!title || !id)
+                return false;
+            /*Просим репозиторий "booksRepository" обновить название книги по ID. Порядок работы такой:
+            1. Если сервер Mongo БД работает и:
+            1.1 книга была обновлена - возвращается true в UI.
+            1.2 книга не была обновлена - возвращается false в UI.
+            2. Если сервер Mongo БД не работает - возвращается ошибка в UI.*/
+            try {
+                return yield books_repository_db_mongo_1.booksRepository.updateBookTitleByID(title, id);
+            }
+            catch (error) {
+                throw error;
+            }
         });
     }
 };

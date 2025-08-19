@@ -12,71 +12,68 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-/*Импортируем библиотеку "request", которая позволяет делать запросы к серверу. supertest сам поднимет наш сервер во
+/*Импортируем объект "request", который позволяет делать запросы к серверу. Библиотека supertest сама поднимет сервер во
 время тестирования.*/
 const supertest_1 = __importDefault(require("supertest"));
-const utils_1 = require("../../src/utils/utils");
+/*Импортируем наше приложение на Express.*/
 const app_1 = require("../../src/app");
-/*Это тесты для локальной версии БД.*/
-describe('/page-one', () => {
+/*Импортируем HTTP-статусы.*/
+const utils_1 = require("../../src/utils/utils");
+/*Это тесты для локальной версии БД. Чтобы тесты отработали нужно в файле "books-service.ts" импортировать
+"booksRepository" из файла "books-repository-db-local.ts".*/
+describe('/books', () => {
     /*Метод "beforeAll()" позволяет запустить какой-то код перед выполнением всех тестов.*/
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(app_1.app).delete('/__test__/data');
+        /*Выполняем DELETE-запрос для очистки тестовых данных. Поскольку запрос на сервер асинхронный, поэтому
+        используем async/await.*/
+        yield (0, supertest_1.default)(app_1.app).delete('/tests/wipe-data');
     }));
-    it('should return 200 and an empty array', () => __awaiter(void 0, void 0, void 0, function* () {
-        /*Поскольку запрос на сервер ассинхронный, то используем async/await. Метод "get" позволяет делать GET-запрос на
-        указанный URL. Метод "expect()" сравнивает, что он получили с тем, что мы указали, и на основе этого говорит
-        пройден ли был тест. В данном случае придет код ответа сервера и какие-то данные.*/
+    it('should return 404 for an empty db', () => __awaiter(void 0, void 0, void 0, function* () {
+        /*Метод "expect()" сравнивает полученные данные с ожидаемыми и на основе этого сообщает пройден ли тест.*/
         yield (0, supertest_1.default)(app_1.app)
-            .get('/page-one')
-            .expect(utils_1.HTTP_STATUSES.OK_200, []);
+            .get('/books')
+            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
     }));
-    it('should return 404 for non-existing book', () => __awaiter(void 0, void 0, void 0, function* () {
-        /*Поскольку запрос на сервер ассинхронный, то используем async/await. Метод "get" позволяет делать GET-запрос на
-        указанный URL. Метод "expect()" сравнивает, что он получили с тем, что мы указали, и на основе этого говорит
-        пройден ли был тест. В данном случае придет код ответа сервера и какие-то данные.*/
+    it('should return 404 for a non-existing book', () => __awaiter(void 0, void 0, void 0, function* () {
         yield (0, supertest_1.default)(app_1.app)
-            .get('/page-one/1')
+            .get('/books/1')
             .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
     }));
     it('should not create a book with incorrect input data', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: '' };
-        /*Поскольку запрос на сервер ассинхронный, то используем async/await. Метод "get" позволяет делать GET-запрос на
-        указанный URL. Метод "expect()" сравнивает, что он получили с тем, что мы указали, и на основе этого говорит
-        пройден ли был тест. В данном случае придет код ответа сервера и какие-то данные.*/
         yield (0, supertest_1.default)(app_1.app)
-            .post('/page-one')
+            .post('/books')
             .send(data)
             .expect(utils_1.HTTP_STATUSES.BAD_REQUEST_400);
         yield (0, supertest_1.default)(app_1.app)
-            .get('/page-one')
-            .expect(utils_1.HTTP_STATUSES.OK_200, []);
+            .get('/books')
+            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
     }));
     let createdBookOne = null;
     it('should create a book with correct input data', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: 'book-five' };
-        /*Запрос вернет ответ, который мы сохраняем в отдельную переменную.*/
+        /*Запрос вернет ответ, который сохраняем в отдельную переменную.*/
         const createdResponse = yield (0, supertest_1.default)(app_1.app)
-            .post('/page-one')
+            .post('/books')
             .send(data)
             .expect(utils_1.HTTP_STATUSES.CREATED_201);
         createdBookOne = createdResponse.body;
-        /*Метод "toEqual()" рекурсивно сравнивает все свойства экземпляров объектов. Он вызывает Object.is для сравнения
-        примитивных значений, что даже лучше для тестирования, чем оператор "===" строгого равенства.*/
+        /*Метод "toEqual()" рекурсивно сравнивает все свойства экземпляров объектов. Он вызывает метод "Object.is()" для
+        сравнения примитивных значений, что даже лучше для тестирования, чем оператор "===".*/
         expect(createdBookOne).toEqual({
-            /*При помощи "expect.any(Number)" указываем, что ожидаем любое число.*/
+            /*При помощи вызова метода "expect.any(Number)" указываем, что ожидаем любое число.*/
             id: expect.any(Number),
             title: data.title
         });
         yield (0, supertest_1.default)(app_1.app)
-            .get('/page-one')
+            .get('/books')
             .expect(utils_1.HTTP_STATUSES.OK_200, [createdBookOne]);
     }));
     let createdBookTwo = null;
     it('create one more book with correct data', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: 'book-six' };
         const createdResponse = yield (0, supertest_1.default)(app_1.app)
-            .post('/page-one')
+            .post('/books')
             .send(data)
             .expect(utils_1.HTTP_STATUSES.CREATED_201);
         createdBookTwo = createdResponse.body;
@@ -85,54 +82,54 @@ describe('/page-one', () => {
             title: data.title
         });
         yield (0, supertest_1.default)(app_1.app)
-            .get('/page-one')
+            .get('/books')
             .expect(utils_1.HTTP_STATUSES.OK_200, [createdBookOne, createdBookTwo]);
     }));
     it('should not update a book with incorrect input data', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: '' };
         yield (0, supertest_1.default)(app_1.app)
-            .put(`/page-one/` + createdBookOne.id)
+            .put(`/books/` + createdBookOne.id)
             .send(data)
             .expect(utils_1.HTTP_STATUSES.BAD_REQUEST_400);
         yield (0, supertest_1.default)(app_1.app)
-            .get(`/page-one/` + createdBookOne.id)
+            .get(`/books/` + createdBookOne.id)
             .expect(utils_1.HTTP_STATUSES.OK_200, createdBookOne);
     }));
     it('should not update a book that does not exist', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: 'book-six' };
         yield (0, supertest_1.default)(app_1.app)
-            .put(`/page-one/` + 200)
+            .put(`/books/` + 200)
             .send(data)
-            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
+            .expect(utils_1.HTTP_STATUSES.BAD_REQUEST_400);
     }));
     it('should update a book with correct input data', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: 'book-five' };
         yield (0, supertest_1.default)(app_1.app)
-            .put(`/page-one/` + createdBookOne.id)
+            .put(`/books/` + createdBookOne.id)
             .send(data)
-            .expect(utils_1.HTTP_STATUSES.NO_CONTENT_204);
+            .expect(utils_1.HTTP_STATUSES.OK_200);
         yield (0, supertest_1.default)(app_1.app)
-            .get(`/page-one/` + createdBookOne.id)
+            .get(`/books/` + createdBookOne.id)
             .expect(utils_1.HTTP_STATUSES.OK_200, Object.assign(Object.assign({}, createdBookOne), { title: data.title }));
         yield (0, supertest_1.default)(app_1.app)
-            .get(`/page-one/` + createdBookTwo.id)
+            .get(`/books/` + createdBookTwo.id)
             .expect(utils_1.HTTP_STATUSES.OK_200, createdBookTwo);
     }));
     it('should delete both books', () => __awaiter(void 0, void 0, void 0, function* () {
         yield (0, supertest_1.default)(app_1.app)
-            .delete(`/page-one/` + createdBookOne.id)
+            .delete(`/books/` + createdBookOne.id)
             .expect(utils_1.HTTP_STATUSES.NO_CONTENT_204);
         yield (0, supertest_1.default)(app_1.app)
-            .get(`/page-one/` + createdBookOne.id)
+            .get(`/books/` + createdBookOne.id)
             .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
         yield (0, supertest_1.default)(app_1.app)
-            .delete(`/page-one/` + createdBookTwo.id)
+            .delete(`/books/` + createdBookTwo.id)
             .expect(utils_1.HTTP_STATUSES.NO_CONTENT_204);
         yield (0, supertest_1.default)(app_1.app)
-            .get(`/page-one/` + createdBookTwo.id)
+            .get(`/books/` + createdBookTwo.id)
             .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
         yield (0, supertest_1.default)(app_1.app)
-            .get('/page-one/')
-            .expect(utils_1.HTTP_STATUSES.OK_200, []);
+            .get('/books/')
+            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
     }));
 });

@@ -1,29 +1,47 @@
-/*Адаптеры нужны, чтобы адаптировать какой-то код, то есть сделать обертку для какого-то кода.*/
+/*Импортируем nodemailer из библиотеки nodemailer для создания транспортера - механизма для работы с почтой.*/
 import nodemailer from 'nodemailer';
+/*Импортируем объект с переменными окружения, используемыми в приложении.*/
+import {settings} from '../settings/settings';
+/*Импортируем типы.*/
+import {MailType} from './types/email-types';
 
+/*Создаем адаптер "emailAdapter" для работы с почтой через библиотеку nodemailer.*/
 export const emailAdapter = {
-    async sendEmail(email: string, subject: string, message: string) {
-        const transporter = nodemailer.createTransport({
-            service: 'gmail', // Имя почтового сервиса.
-            // Настройки ниже не нужны, если указан service.
-            // host: 'smtp.gmail.com', // Хост почтового сервиса.
-            // port: 587,
-            // secure: false, // Use `true` for port 465, `false` for all other ports
-            auth: {
-                user: "youremail@gmail.com", // Ваша почта.
-                pass: "aaaa aaaa aaaa aaaa ", // Пароль приложения из google.
-            },
-        });
+    /*Создаем метод "sendEmail()" для отправки писем. В качестве параметров этот метод получает адреса получателей, тему
+    письма и тело письма.*/
+    async sendMail(mail: MailType) {
+        try {
+            /*При помощи метода "nodemailer.createTransport()" создаем транспортер - механизм для работы с почтой. В
+            параметрах этого метода конфигурируем создаваемый транспортер.*/
+            const transporter = nodemailer.createTransport({
+                /*Имя почтового сервиса.*/
+                service: 'gmail',
+                auth: {
+                    /*Адрес почты, используемый для отправки писем.*/
+                    user: settings.EMAIL,
+                    /*Пароль приложения из Google.*/
+                    pass: settings.APP_PASS
+                },
+            });
 
-        // send mail with defined transport object
-        const info = await transporter.sendMail({
-            from: '"Adam Jensen" <youremail@gmail.com>', // sender address
-            to: email, // list of receivers
-            subject: subject, // Subject line
-            // text: "Did you ever ask for this?", // plain text body
-            html: message, // html body
-        });
+            /*Формируем объект с данными для письма и отправляем письмо через созданный транспортер.*/
+            const info = await transporter.sendMail({
+                /*Адрес отправителя.*/
+                from: '"Adam Jensen" <youremail@gmail.com>',
+                /*Адреса получателей.*/
+                to: mail.email,
+                /*Тема письма.*/
+                subject: mail.subject,
+                /*Тело письма в виде HTML.*/
+                html: mail.message, // html body
+                /*Тело письма в виде текста.*/
+                // text: "Did you ever ask for this?"
+            });
 
-        console.log(info);
+            console.log(info);
+            return info;
+        } catch (error) {
+            throw error;
+        }
     }
 };

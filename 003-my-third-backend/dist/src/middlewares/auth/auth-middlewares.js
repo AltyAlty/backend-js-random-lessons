@@ -10,34 +10,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authMiddleware = void 0;
-const jwt_service_1 = require("../../application/jwt-service");
+/*Импортируем сервисы.*/
 const users_service_1 = require("../../domain/users-service");
-/*Промежуточный слой для проверки пользователя по токену.*/
+/*Импортируем приложения.*/
+const jwt_application_1 = require("../../applications/jwt-application");
+/*Импортируем HTTP-статусы.*/
+const utils_1 = require("../../utils/utils");
+/*Создаем middleware для авторизации пользователя по токену. Этот слой при успешной авторизации добавляет данные о
+пользователе в запрос.*/
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    /*Проверяем есть ли в загаловках запроса от клиента токен.*/
+    /*Если в заголовках запроса от клиента нет раздела "authorization", то сообщаем клиенту об отказе в авторизации.*/
     if (!req.headers.authorization) {
-        res.send(401);
+        res.sendStatus(utils_1.HTTP_STATUSES.UNAUTHORIZED_401);
         return;
     }
-    /*Если в загаловках запроса от клиента есть токен, то получаем токен, так как в заголовке будет находится строка по
-    типу: Bearer token.*/
+    /*Если в заголовках запроса от клиента есть раздел "authorization", содержащий токен, то берем этот токен, так как в
+    разделе "authorization", скорее всего, будет находиться строка примерно такого вида: "Bearer token".*/
     const token = req.headers.authorization.split(' ')[1];
-    /*Получаем ID пользователя по токену.*/
-    const userID = yield jwt_service_1.jwtService.getUserIDByToken(token);
-    /*Если ID пользователя было найдено, то кладем данные о пользователе в запрос.*/
-    if (userID) {
-        /*Желательно так не вставлять напрямую пользователя в запрос. Лучше подготовить в запросе отдельный объект для
-        передачи такой дополнительной информации.*/
-        req.user = yield users_service_1.usersService.findUserByID(userID);
+    /*Просим приложение "jwtApplication" найти по токену ID пользователя.*/
+    const userID = yield jwt_application_1.jwtApplication.getUserIDByToken(token);
+    /*Если ID пользователя не было найдено, то сообщаем клиенту об отказе в авторизации.*/
+    if (!userID) {
+        res.sendStatus(utils_1.HTTP_STATUSES.UNAUTHORIZED_401);
+        return;
+    }
+    /*Если ID пользователя было найдено, то кладем данные о пользователе в запрос. Желательно напрямую не вставлять
+    данные пользователя в запрос. Лучше подготовить в запросе отдельный объект для передачи такой дополнительной
+    информации.*/
+    try {
+        req.user = yield users_service_1.usersService.findUserByID(userID.toString());
         next();
     }
-    else {
-        res.send(401);
+    catch (error) {
+        /*Если сервер Mongo БД не работает, то сообщается клиенту об ошибке при работе с сервером Mongo БД.*/
+        res.sendStatus(utils_1.HTTP_STATUSES.INTERNAL_SERVER_ERROR_500);
     }
-    /*Если ID пользователя не было найдено, то отправляем код 401. Этот код приводит к ошибке "Cannot set headers after
-    they are sent to the client", так как после успешной проверки токена и установки req.user, мы все равно отправляем
-    ответ клиенту с кодом состояния 401. Это приводит к конфликту, так как уже был отправлен ответ клиенту. Для решения
-    этой проблемы, например, можно добавить return в блок if или поместить в блок else код со статусом 401.*/
-    // res.send(401);
 });
 exports.authMiddleware = authMiddleware;

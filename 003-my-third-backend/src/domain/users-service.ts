@@ -1,58 +1,109 @@
-import {usersRepository} from '../repositories/users-repository-db';
-import {ObjectId} from 'mongodb';
+/*Импортируем bcrypt из библиотеки bcrypt для создания хэш-соли и хэширования паролей.*/
 import bcrypt from 'bcrypt';
-import {UserDBType} from '../db/db';
+/*Импортируем ObjectId из MongoDB для создания ID и типизации.*/
+import {ObjectId} from 'mongodb';
+/*Импортируем репозиторий для работы с пользователями из Mongo БД.*/
+import {usersRepository} from '../repositories/mongo/users-repository-db-mongo';
+/*Импортируем менеджеры.*/
 import {emailManager} from '../managers/email-manager';
+/*Импортируем типы.*/
+import {UserDBType} from '../db/types/db-types';
+/*Импортируем модели.*/
+import {UserViewModel} from '../models/views/UserViewModel';
+import {
+    GetUserByLoginOrEmailWithQueryParamsInputModel
+} from '../models/inputs/GetUserByLoginOrEmailWithQueryParamsInputModel';
 
+/*Создаем вспомогательную функцию "mapUserDBTypeToUserViewModel()" для преобразования объектов типа "UserDBType" в
+объекты типа "UserViewModel".*/
+export const mapUserDBTypeToUserViewModel = (user: UserDBType): UserViewModel => {
+    return {
+        id: user._id.toString(),
+        userName: user.userName,
+        email: user.email
+    };
+};
+
+/*Создаем сервис "booksService" для работы с пользователями.*/
 export const usersService = {
-    /*Создание нового пользователя на BLL уровне.*/
-    async createUser(login: string, email: string, password: string): Promise<UserDBType> {
-        /*Получаем хэш-соль. В качестве параметра указываем количество раундов, что является цифрой 2 в какой-то
-        степени. У нас это 2 в 10 степени. Это число каким-то образом склеится с солью.*/
-        const passwordSalt = await bcrypt.genSalt(10);
-        const passwordHash = await this._generateHash(password, passwordSalt); // Генерируем хэш.
+    /*Создаем метод "findUserByLoginOrEmail()" для поиска пользователя по логину или почте.*/
+    async findUserByLoginOrEmail(loginOrEmail: GetUserByLoginOrEmailWithQueryParamsInputModel):
+        Promise<UserViewModel | null> {
+        /*Просим репозиторий "usersRepository" найти пользователя по логину или почте. Порядок работы такой:
+        1. Если сервер Mongo БД работает и:
+        1.1 пользователь был найден - возвращаются данные по найденному пользователю в UI.
+        1.2 пользователь не был найден - возвращается null в UI.
+        2. Если сервер Mongo БД не работает - возвращается ошибка в UI.*/
+        try { return usersRepository.findUserByLoginOrEmail(loginOrEmail) } catch (error) { throw error }
+    },
 
-        const newUser: UserDBType = { // Создаем объект для пользователя, не сохраняя в нем сам пароль.
+    /*Создаем метод "findAllUsers()" для поиска всех пользователей.*/
+    async findAllUsers(): Promise<UserViewModel[]> {
+        /*Просим репозиторий "usersRepository" найти всех пользователей. Порядок работы такой:
+        1. Если сервер Mongo БД работает и:
+        1.1 пользователи были найдены - возвращается массив с пользователями в UI.
+        1.2 пользователи не были найдены - возвращается пустой массив в UI.
+        2. Если сервер Mongo БД не работает - возвращается ошибка в UI.*/
+        try { return await usersRepository.findAllUsers() } catch (error) { throw error }
+    },
+
+    /*Создаем метод "findUserByID()" для поиск пользователя по ID.*/
+    async findUserByID(id: string): Promise<UserViewModel | null> {
+        /*Просим репозиторий "usersRepository" найти пользователя по ID. Порядок работы такой:
+        1. Если сервер Mongo БД работает и:
+        1.1 пользователь был найден - возвращаются данные по найденному пользователю в UI.
+        1.2 пользователь не был найден - возвращается null в UI.
+        2. Если сервер Mongo БД не работает - возвращается ошибка в UI.*/
+        try { return usersRepository.findUserByID(new ObjectId(id)) } catch (error) { throw error }
+    },
+
+    /*Создаем метод "createUser()" для создания нового пользователя с логином, почтой и паролем.*/
+    async createUser(login: string, email: string, password: string): Promise<UserViewModel | null> {
+        /*Генерируем хэш-соль. В качестве параметра для генерации хэш-соли указываем количество раундов, что является
+        степенью для цифры 2. Это число каким-то образом склеивается с паролем при хешировании пароля.*/
+        const passwordSalt = await bcrypt.genSalt(10);
+        /*Хэшируем пароль на основе пароля пользователя и хэш-соли.*/
+        const passwordHash = await this._generateHash(password, passwordSalt);
+
+        /*Создаем объект для пользователя, не указывая в нем пароль.s*/
+        const newUser: UserDBType = {
             _id: new ObjectId,
             userName: login,
             email: email,
             passwordHash: passwordHash,
-            passwordSalt: passwordSalt, // На самом деле лучше соль не сохранять, так как она содержится в хэше.
+            /*Хэш-сол лучше здесь не сохранять, так как она содержится в захэшированном пароле.*/
+            passwordSalt: passwordSalt,
             createdAt: new Date(),
+            /*Объект с данными, которые нужны для подтверждения почты пользователя при регистрации.*/
             emailConfirmation: {
-                confirmationCode: (+(new Date())).toString(), // Код подтверждения почты.
-                expirationDate: new Date(new Date().getTime() + (10 * 60 * 1000)), // Дата истечения кода.
-                isConfirmed: false, // Подтверждена ли почта.
+                /*Генерируем код для подтверждения почты.*/
+                confirmationCode: (+(new Date())).toString(),
+                /*Генерируем дату истечения кода для подтверждения почты.*/
+                expirationDate: new Date(new Date().getTime() + (10 * 60 * 1000)),
+                /*Флаг, указывающий подтверждена ли почта.*/
+                isConfirmed: false
             }
         };
 
-        await emailManager.sendEmailConfirmationMessage(newUser); // Отправляем письмо для подтверждения.
-        return usersRepository.createUser(newUser); // Отправляем данные на DAL уровень.
+        try {
+            /*Просим менеджера "emailManager" отправить письмо для подтверждения почты пользователя при регистрации.*/
+            await emailManager.sendEmailConfirmationMail(newUser);
+
+            /*Просим репозиторий "usersRepository" создать нового пользователя с логином, почтой и паролем. Порядок
+            работы такой:
+            1. Если сервер Mongo БД работает и:
+            1.1 пользователь был создан - возвращаются данные по созданному пользователю в UI.
+            1.2 пользователь не был создан - возвращается null в UI.
+            2. Если сервер Mongo БД не работает - возвращается ошибка в UI.*/
+            return await usersRepository.createUser(newUser);
+        } catch (error) {
+            throw error;
+        }
     },
 
-    /*Поиск пользователя по ID на BLL уровне.*/
-    async findUserByID(id: ObjectId): Promise<UserDBType | null> {
-        return usersRepository.findUserByID(id);
-    },
-
-    /*Логинизация пользователя на BLL уровне.*/
-    async checkCredentials(loginOrEmail: string, password: string) {
-        /*Ищем в БД пользователя на уровне DAL.*/
-        const user = await usersRepository.findByLoginOrEmail(loginOrEmail);
-        /*Если пользователя нет, то отказываем в логинизации.*/
-        if (!user || !user.emailConfirmation.isConfirmed) return false;
-        /*Если пользователь есть в БД, то генерируем хэш.*/
-        const passwordHash = await this._generateHash(password, user.passwordSalt);
-        /*Если сгенерированный хэш не совпадает с хэшем из БД, то отказываем в логинизации.*/
-        if (user.passwordHash !== passwordHash) return false;
-        /*Если же сгенерированный хэш совпадает с хэшем из БД, то разрешаем логинизацию.*/
-        return user;
-    },
-
-    /*Генерация хэша для пароля.*/
+    /*Создаем вспомогательный метод "_generateHash()" для хэширования паролей пользователей.*/
     async _generateHash(password: string, salt: string) {
-        const hash = await bcrypt.hash(password, salt);
-        // console.log(`hash: ${hash}`);
-        return hash;
+        /*Хэшируем пароль на основе пароля пользователя и хэш-соли.*/
+        return await bcrypt.hash(password, salt);
     }
 }

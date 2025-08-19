@@ -13,31 +13,48 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.emailAdapter = void 0;
-/*Адаптеры нужны, чтобы адаптировать какой-то код, то есть сделать обертку для какого-то кода.*/
+/*Импортируем nodemailer из библиотеки nodemailer для создания транспортера - механизма для работы с почтой.*/
 const nodemailer_1 = __importDefault(require("nodemailer"));
+/*Импортируем объект с переменными окружения, используемыми в приложении.*/
+const settings_1 = require("../settings/settings");
+/*Создаем адаптер "emailAdapter" для работы с почтой через библиотеку nodemailer.*/
 exports.emailAdapter = {
-    sendEmail(email, subject, message) {
+    /*Создаем метод "sendEmail()" для отправки писем. В качестве параметров этот метод получает адреса получателей, тему
+    письма и тело письма.*/
+    sendMail(mail) {
         return __awaiter(this, void 0, void 0, function* () {
-            const transporter = nodemailer_1.default.createTransport({
-                service: 'gmail',
-                // Настройки ниже не нужны, если указан service.
-                // host: 'smtp.gmail.com', // Хост почтового сервиса.
-                // port: 587,
-                // secure: false, // Use `true` for port 465, `false` for all other ports
-                auth: {
-                    user: "youremail@gmail.com",
-                    pass: "aaaa aaaa aaaa aaaa ", // Пароль приложения из google.
-                },
-            });
-            // send mail with defined transport object
-            const info = yield transporter.sendMail({
-                from: '"Adam Jensen" <youremail@gmail.com>',
-                to: email,
-                subject: subject,
-                // text: "Did you ever ask for this?", // plain text body
-                html: message, // html body
-            });
-            console.log(info);
+            try {
+                /*При помощи метода "nodemailer.createTransport()" создаем транспортер - механизм для работы с почтой. В
+                параметрах этого метода конфигурируем создаваемый транспортер.*/
+                const transporter = nodemailer_1.default.createTransport({
+                    /*Имя почтового сервиса.*/
+                    service: 'gmail',
+                    auth: {
+                        /*Адрес почты, используемый для отправки писем.*/
+                        user: settings_1.settings.EMAIL,
+                        /*Пароль приложения из Google.*/
+                        pass: settings_1.settings.APP_PASS
+                    },
+                });
+                /*Формируем объект с данными для письма и отправляем письмо через созданный транспортер.*/
+                const info = yield transporter.sendMail({
+                    /*Адрес отправителя.*/
+                    from: '"Adam Jensen" <youremail@gmail.com>',
+                    /*Адреса получателей.*/
+                    to: mail.email,
+                    /*Тема письма.*/
+                    subject: mail.subject,
+                    /*Тело письма в виде HTML.*/
+                    html: mail.message, // html body
+                    /*Тело письма в виде текста.*/
+                    // text: "Did you ever ask for this?"
+                });
+                console.log(info);
+                return info;
+            }
+            catch (error) {
+                throw error;
+            }
         });
     }
 };
