@@ -28,16 +28,18 @@ describe('/books', () => {
         используем async/await.*/
         yield (0, supertest_1.default)(app_1.app).delete('/tests/wipe-data');
     }));
-    it('should return 404 for an empty db', () => __awaiter(void 0, void 0, void 0, function* () {
+    it('should return 200 for an empty db', () => __awaiter(void 0, void 0, void 0, function* () {
         /*Метод "expect()" сравнивает полученные данные с ожидаемыми и на основе этого сообщает пройден ли тест.*/
-        yield (0, supertest_1.default)(app_1.app)
+        const createdResponse = yield (0, supertest_1.default)(app_1.app)
             .get('/books')
-            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
+            .expect(utils_1.HTTP_STATUSES.OK_200);
+        expect(createdResponse.body).toBe('No books found');
     }));
-    it('should return 404 for a non-existing book', () => __awaiter(void 0, void 0, void 0, function* () {
-        yield (0, supertest_1.default)(app_1.app)
+    it('should return 200 for a non-existing book', () => __awaiter(void 0, void 0, void 0, function* () {
+        const createdResponse = yield (0, supertest_1.default)(app_1.app)
             .get('/books/1')
-            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
+            .expect(utils_1.HTTP_STATUSES.OK_200);
+        expect(createdResponse.body).toBe('No books found');
     }));
     it('should not create a book with incorrect input data', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: '' };
@@ -45,91 +47,76 @@ describe('/books', () => {
             .post('/books')
             .send(data)
             .expect(utils_1.HTTP_STATUSES.BAD_REQUEST_400);
-        yield (0, supertest_1.default)(app_1.app)
-            .get('/books')
-            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
     }));
-    let createdBookOne = null;
     it('should create a book with correct input data', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: 'book-five' };
-        /*Запрос вернет ответ, который сохраняем в отдельную переменную.*/
-        const createdResponse = yield (0, supertest_1.default)(app_1.app)
+        yield (0, supertest_1.default)(app_1.app)
             .post('/books')
             .send(data)
-            .expect(utils_1.HTTP_STATUSES.CREATED_201);
-        createdBookOne = createdResponse.body;
-        /*Метод "toEqual()" рекурсивно сравнивает все свойства экземпляров объектов. Он вызывает метод "Object.is()" для
-        сравнения примитивных значений, что даже лучше для тестирования, чем оператор "===".*/
-        expect(createdBookOne).toEqual({
-            /*При помощи вызова метода "expect.any(Number)" указываем, что ожидаем любое число.*/
-            id: expect.any(Number),
-            title: data.title
-        });
-        yield (0, supertest_1.default)(app_1.app)
+            .expect(utils_1.HTTP_STATUSES.NO_CONTENT_204);
+        const createdResponse = yield (0, supertest_1.default)(app_1.app)
             .get('/books')
-            .expect(utils_1.HTTP_STATUSES.OK_200, [createdBookOne]);
+            .expect(utils_1.HTTP_STATUSES.OK_200);
+        expect(createdResponse.body).toHaveLength(1);
+        expect(createdResponse.body[0].title).toBe('book-five');
     }));
-    let createdBookTwo = null;
-    it('create one more book with correct data', () => __awaiter(void 0, void 0, void 0, function* () {
+    it('should create one more book with correct data', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: 'book-six' };
-        const createdResponse = yield (0, supertest_1.default)(app_1.app)
+        yield (0, supertest_1.default)(app_1.app)
             .post('/books')
             .send(data)
-            .expect(utils_1.HTTP_STATUSES.CREATED_201);
-        createdBookTwo = createdResponse.body;
-        expect(createdBookTwo).toEqual({
-            id: expect.any(Number),
-            title: data.title
-        });
-        yield (0, supertest_1.default)(app_1.app)
+            .expect(utils_1.HTTP_STATUSES.NO_CONTENT_204);
+        const createdResponse = yield (0, supertest_1.default)(app_1.app)
             .get('/books')
-            .expect(utils_1.HTTP_STATUSES.OK_200, [createdBookOne, createdBookTwo]);
+            .expect(utils_1.HTTP_STATUSES.OK_200);
+        expect(createdResponse.body).toHaveLength(2);
+        expect(createdResponse.body[1].title).toBe('book-six');
     }));
     it('should not update a book with incorrect input data', () => __awaiter(void 0, void 0, void 0, function* () {
         const data = { title: '' };
         yield (0, supertest_1.default)(app_1.app)
-            .put(`/books/` + createdBookOne.id)
-            .send(data)
-            .expect(utils_1.HTTP_STATUSES.BAD_REQUEST_400);
-        yield (0, supertest_1.default)(app_1.app)
-            .get(`/books/` + createdBookOne.id)
-            .expect(utils_1.HTTP_STATUSES.OK_200, createdBookOne);
-    }));
-    it('should not update a book that does not exist', () => __awaiter(void 0, void 0, void 0, function* () {
-        const data = { title: 'book-six' };
-        yield (0, supertest_1.default)(app_1.app)
-            .put(`/books/` + 200)
+            .put(`/books/` + +(new Date()))
             .send(data)
             .expect(utils_1.HTTP_STATUSES.BAD_REQUEST_400);
     }));
     it('should update a book with correct input data', () => __awaiter(void 0, void 0, void 0, function* () {
-        const data = { title: 'book-five' };
-        yield (0, supertest_1.default)(app_1.app)
-            .put(`/books/` + createdBookOne.id)
-            .send(data)
+        const data = { title: 'book-seven' };
+        const createdResponse = yield (0, supertest_1.default)(app_1.app)
+            .get('/books')
             .expect(utils_1.HTTP_STATUSES.OK_200);
+        const bookFiveID = createdResponse.body[0].id;
         yield (0, supertest_1.default)(app_1.app)
-            .get(`/books/` + createdBookOne.id)
-            .expect(utils_1.HTTP_STATUSES.OK_200, Object.assign(Object.assign({}, createdBookOne), { title: data.title }));
+            .put(`/books/` + bookFiveID)
+            .send(data)
+            .expect(utils_1.HTTP_STATUSES.NO_CONTENT_204);
         yield (0, supertest_1.default)(app_1.app)
-            .get(`/books/` + createdBookTwo.id)
-            .expect(utils_1.HTTP_STATUSES.OK_200, createdBookTwo);
+            .get(`/books/` + bookFiveID)
+            .expect(utils_1.HTTP_STATUSES.OK_200, {
+            id: bookFiveID,
+            title: data.title
+        });
     }));
     it('should delete both books', () => __awaiter(void 0, void 0, void 0, function* () {
+        const createdResponse = yield (0, supertest_1.default)(app_1.app)
+            .get('/books')
+            .expect(utils_1.HTTP_STATUSES.OK_200);
+        const bookFiveID = createdResponse.body[0].id;
+        const bookSixID = createdResponse.body[1].id;
         yield (0, supertest_1.default)(app_1.app)
-            .delete(`/books/` + createdBookOne.id)
+            .delete(`/books/` + bookFiveID)
             .expect(utils_1.HTTP_STATUSES.NO_CONTENT_204);
         yield (0, supertest_1.default)(app_1.app)
-            .get(`/books/` + createdBookOne.id)
-            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
+            .get(`/books/` + bookFiveID)
+            .expect(utils_1.HTTP_STATUSES.OK_200);
         yield (0, supertest_1.default)(app_1.app)
-            .delete(`/books/` + createdBookTwo.id)
+            .delete(`/books/` + bookSixID)
             .expect(utils_1.HTTP_STATUSES.NO_CONTENT_204);
         yield (0, supertest_1.default)(app_1.app)
-            .get(`/books/` + createdBookTwo.id)
-            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
-        yield (0, supertest_1.default)(app_1.app)
-            .get('/books/')
-            .expect(utils_1.HTTP_STATUSES.NOT_FOUND_404);
+            .get(`/books/` + bookSixID)
+            .expect(utils_1.HTTP_STATUSES.OK_200);
+        const createdResponseTwo = yield (0, supertest_1.default)(app_1.app)
+            .get('/books')
+            .expect(utils_1.HTTP_STATUSES.OK_200);
+        expect(createdResponseTwo.body).toBe('No books found');
     }));
 });

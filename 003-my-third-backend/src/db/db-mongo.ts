@@ -97,8 +97,10 @@ db.getCollection('feedbacks').find({})
 
 /*Импортируем MongoClient из MongoDB для создания клиента для MongoDB.*/
 import {MongoClient} from 'mongodb';
+/*Импортируем mongoose из Mongoose для работы с MongoDB через Mongoose.*/
+import mongoose from 'mongoose';
 /*Импортируем типы.*/
-import {BookDBType, FeedbackDBType, UserDBType} from './types/db-types';
+import {BookDBType, FeedbackDBType, mainPageContentDBType, UserDBType} from './types/db-types';
 
 /*Делаем так, чтобы URI определялся автоматически от окружения.*/
 const mongoURI = process.env.mongoURI || 'mongodb://0.0.0.0:27017';
@@ -108,22 +110,25 @@ const client = new MongoClient(mongoURI);
 /*Создаем функцию "connectDB()" для присоединения к Mongo БД.*/
 export async function connectDB() {
     try {
-        /*Пытаемся присоединить клиента для MongoDB к серверу, где развернута Mongo БД.*/
-        await client.connect();
-        /*Проверяем соединение.*/
-        await client.db('bookshop').command({ping: 1});
+        /*Присоединяем клиента для MongoDB к серверу, где развернута Mongo БД, и проверяем соединение.*/
+        // await client.connect();
+        // await client.db('bookshop').command({ping: 1});
+        /*Аналог через Mongoose.*/
+        await mongoose.connect(mongoURI + '/' + 'bookshop');
         console.log('Successfully connected to the Mongo server');
     } catch {
         console.log('Cannot connect to the Mongo server');
         /*Закрываем соединение в случае неудачной попытки подключения к серверу, где развернута Mongo БД.*/
-        await client.close();
+        // await client.close();
+        /*Аналог через Mongoose.*/
+        await mongoose.disconnect();
     }
-};
+}
 
 /*Выбираем БД "bookshop" из Mongo БД.*/
 const remoteDB = client.db('bookshop');
 /*Получаем коллекции из БД "bookshop". У этих коллекций будут методы, копирующие функционал команд из MongoDB.*/
-export const mainPageContentCollection = remoteDB.collection('main-page');
+export const mainPageContentCollection = remoteDB.collection<mainPageContentDBType>('main-page');
 export const booksCollection = remoteDB.collection<BookDBType>('books');
 export const usersCollection = remoteDB.collection<UserDBType>('users');
 export const feedbacksCollection = remoteDB.collection<FeedbackDBType>('feedbacks');

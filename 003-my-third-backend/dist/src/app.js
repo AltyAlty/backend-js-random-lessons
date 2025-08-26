@@ -29,7 +29,7 @@ exports.app.use(exports.jsonBodyMiddleware);
 /*Подключаем middlewares. Порядок подключения middlewares важен.*/
 exports.app.use(request_counter_middleware_1.requestCounterMiddleware);
 exports.app.use(useless_info_middleware_1.uselessInfoMiddleware);
-// app.use(fakeAuthMiddleware);
+// app.use(fakeAuthorizationMiddleware);
 /*Подключаем роутеры. Здесь нужно указывать корневой путь адреса, к которому роутеры будут дописывать подпути в
 зависимости от их конфигурации.*/
 exports.app.use('/books', (0, books_routes_1.getBooksRouter)());

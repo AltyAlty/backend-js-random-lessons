@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mainPageRepository = void 0;
-/*Импортируем коллекции из Mongo БД.*/
-const db_mongo_1 = require("../../db/db-mongo");
+/*Импортируем Mongoose модели.*/
+const schemas_1 = require("../../db/schemas/schemas");
 /*Создаем репозиторий "mainPageRepository" для работы с данными для главной страницы из Mongo БД.*/
 exports.mainPageRepository = {
     /*Создаем метод "getMainPageContent()" для получения данных для главной страницы из Mongo БД.*/
@@ -23,7 +23,9 @@ exports.mainPageRepository = {
             1.2 данные для главной страницы не были найдены - возвращается null в BLL.
             2. Если сервер Mongo БД не работает - возвращается ошибка в BLL.*/
             try {
-                const content = yield db_mongo_1.mainPageContentCollection.findOne({});
+                // const content: WithId<Document> | null = await mainPageContentCollection.findOne({});
+                /*Аналог через Mongoose.*/
+                const content = yield schemas_1.MainPageContentModel.findOne();
                 if (!content)
                     return null;
                 return content.content;

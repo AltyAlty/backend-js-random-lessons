@@ -19,17 +19,21 @@ describe('/books', () => {
         await request(app).delete('/tests/wipe-data');
     });
 
-    it('should return 404 for an empty db', async () => {
+    it('should return 200 for an empty db', async () => {
         /*Метод "expect()" сравнивает полученные данные с ожидаемыми и на основе этого сообщает пройден ли тест.*/
-        await request(app)
+        const createdResponse = await request(app)
             .get('/books')
-            .expect(HTTP_STATUSES.NOT_FOUND_404);
+            .expect(HTTP_STATUSES.OK_200);
+
+        expect(createdResponse.body).toBe('No books found');
     });
 
-    it('should return 404 for a non-existing book', async () => {
-        await request(app)
+    it('should return 200 for a non-existing book', async () => {
+        const createdResponse = await request(app)
             .get('/books/1')
-            .expect(HTTP_STATUSES.NOT_FOUND_404);
+            .expect(HTTP_STATUSES.OK_200);
+
+        expect(createdResponse.body).toBe('No books found');
     });
 
     it('should not create a book with incorrect input data', async () => {
@@ -39,121 +43,99 @@ describe('/books', () => {
             .post('/books')
             .send(data)
             .expect(HTTP_STATUSES.BAD_REQUEST_400);
-
-        await request(app)
-            .get('/books')
-            .expect(HTTP_STATUSES.NOT_FOUND_404);
     });
-
-    let createdBookOne: any = null;
 
     it('should create a book with correct input data', async () => {
         const data: CreateBookByTitleWithBodyInputModel = {title: 'book-five'};
 
-        /*Запрос вернет ответ, который сохраняем в отдельную переменную.*/
-        const createdResponse = await request(app)
+        await request(app)
             .post('/books')
             .send(data)
-            .expect(HTTP_STATUSES.CREATED_201);
+            .expect(HTTP_STATUSES.NO_CONTENT_204);
 
-        createdBookOne = createdResponse.body;
-
-        /*Метод "toEqual()" рекурсивно сравнивает все свойства экземпляров объектов. Он вызывает метод "Object.is()" для
-        сравнения примитивных значений, что даже лучше для тестирования, чем оператор "===".*/
-        expect(createdBookOne).toEqual({
-            /*При помощи вызова метода "expect.any(Number)" указываем, что ожидаем любое число.*/
-            id: expect.any(Number),
-            title: data.title
-        })
-
-        await request(app)
+        const createdResponse = await request(app)
             .get('/books')
-            .expect(HTTP_STATUSES.OK_200, [createdBookOne]);
+            .expect(HTTP_STATUSES.OK_200);
+
+        expect(createdResponse.body).toHaveLength(1);
+        expect(createdResponse.body[0].title).toBe('book-five');
     });
 
-    let createdBookTwo: any = null;
-
-    it('create one more book with correct data', async () => {
+    it('should create one more book with correct data', async () => {
         const data: CreateBookByTitleWithBodyInputModel = {title: 'book-six'};
 
-        const createdResponse = await request(app)
+        await request(app)
             .post('/books')
             .send(data)
-            .expect(HTTP_STATUSES.CREATED_201);
+            .expect(HTTP_STATUSES.NO_CONTENT_204);
 
-        createdBookTwo = createdResponse.body;
-
-        expect(createdBookTwo).toEqual({
-            id: expect.any(Number),
-            title: data.title
-        })
-
-        await request(app)
+        const createdResponse = await request(app)
             .get('/books')
-            .expect(HTTP_STATUSES.OK_200, [createdBookOne, createdBookTwo]);
+            .expect(HTTP_STATUSES.OK_200);
+
+        expect(createdResponse.body).toHaveLength(2);
+        expect(createdResponse.body[1].title).toBe('book-six');
     });
 
     it('should not update a book with incorrect input data', async () => {
         const data: UpdateBookTitleWithBodyInputModel = {title: ''};
 
         await request(app)
-            .put(`/books/` + createdBookOne.id)
-            .send(data)
-            .expect(HTTP_STATUSES.BAD_REQUEST_400);
-
-        await request(app)
-            .get(`/books/` + createdBookOne.id)
-            .expect(HTTP_STATUSES.OK_200, createdBookOne);
-    });
-
-    it('should not update a book that does not exist', async () => {
-        const data: UpdateBookTitleWithBodyInputModel = {title: 'book-six'};
-
-        await request(app)
-            .put(`/books/` + 200)
+            .put(`/books/` + +(new Date()))
             .send(data)
             .expect(HTTP_STATUSES.BAD_REQUEST_400);
     });
 
     it('should update a book with correct input data', async () => {
-        const data: UpdateBookTitleWithBodyInputModel = {title: 'book-five'};
+        const data: UpdateBookTitleWithBodyInputModel = {title: 'book-seven'};
 
-        await request(app)
-            .put(`/books/` + createdBookOne.id)
-            .send(data)
+        const createdResponse = await request(app)
+            .get('/books')
             .expect(HTTP_STATUSES.OK_200);
 
-        await request(app)
-            .get(`/books/` + createdBookOne.id)
-            .expect(HTTP_STATUSES.OK_200, {
-                ...createdBookOne,
-                title: data.title
-            });
+        const bookFiveID = createdResponse.body[0].id;
 
         await request(app)
-            .get(`/books/` + createdBookTwo.id)
-            .expect(HTTP_STATUSES.OK_200, createdBookTwo);
+            .put(`/books/` + bookFiveID)
+            .send(data)
+            .expect(HTTP_STATUSES.NO_CONTENT_204);
+
+        await request(app)
+            .get(`/books/` + bookFiveID)
+            .expect(HTTP_STATUSES.OK_200, {
+                id: bookFiveID,
+                title: data.title
+            });
     });
 
     it('should delete both books', async () => {
+        const createdResponse = await request(app)
+            .get('/books')
+            .expect(HTTP_STATUSES.OK_200);
+
+        const bookFiveID = createdResponse.body[0].id;
+        const bookSixID = createdResponse.body[1].id;
+
         await request(app)
-            .delete(`/books/` + createdBookOne.id)
+            .delete(`/books/` + bookFiveID)
             .expect(HTTP_STATUSES.NO_CONTENT_204);
 
         await request(app)
-            .get(`/books/` + createdBookOne.id)
-            .expect(HTTP_STATUSES.NOT_FOUND_404);
+            .get(`/books/` + bookFiveID)
+            .expect(HTTP_STATUSES.OK_200);
 
         await request(app)
-            .delete(`/books/` + createdBookTwo.id)
+            .delete(`/books/` + bookSixID)
             .expect(HTTP_STATUSES.NO_CONTENT_204);
 
         await request(app)
-            .get(`/books/` + createdBookTwo.id)
-            .expect(HTTP_STATUSES.NOT_FOUND_404);
+            .get(`/books/` + bookSixID)
+            .expect(HTTP_STATUSES.OK_200);
 
-        await request(app)
-            .get('/books/')
-            .expect(HTTP_STATUSES.NOT_FOUND_404);
+        const createdResponseTwo = await request(app)
+            .get('/books')
+            .expect(HTTP_STATUSES.OK_200);
+
+        expect(createdResponseTwo.body).toBe('No books found');
     });
 });

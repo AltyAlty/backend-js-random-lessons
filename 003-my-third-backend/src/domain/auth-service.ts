@@ -14,7 +14,7 @@ export const authService = {
             /*Просим репозиторий "usersRepository" найти пользователя по логину или почте для проверки наличия
             пользователя в БД и корректности указанного пароля при аутентификации.*/
             const user: UserDBType | null = await
-                usersRepository.findUserToCheckCredentialsByLoginOrEmail(loginOrEmail);
+                usersRepository.findUserByLoginOrEmailToCheckCredentials(loginOrEmail);
             /*Если пользователь не был найден или почта пользователя еще не была подтверждена, то сообщаем UI о том, что
             есть проблемы с учетными данными пользователя.*/
             if (!user || !user.emailConfirmation.isConfirmed) return false;
@@ -37,7 +37,7 @@ export const authService = {
     async confirmEmail(email: string, code: string): Promise<boolean> {
         try {
             /*Просим репозиторий "usersRepository" найти пользователя по почте для проверки наличия пользователя в БД.*/
-            const user: UserDBType | null = await usersRepository.findUserToCheckCredentialsByLoginOrEmail(email);
+            const user: UserDBType | null = await usersRepository.findUserByLoginOrEmailToCheckCredentials(email);
 
             /*Если пользователь не был найден, почта пользователя уже была подтверждена, был указан неверный код для
             подтверждения почты или код для подтверждения почты истек, то сообщаем UI об отказе в подтверждении почты

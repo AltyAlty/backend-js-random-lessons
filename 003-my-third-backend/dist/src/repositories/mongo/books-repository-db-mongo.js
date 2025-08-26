@@ -10,11 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.booksRepository = void 0;
-/*Импортируем коллекции из Mongo БД.*/
-const db_mongo_1 = require("../../db/db-mongo");
 /*Импортируем функцию "mapBookDBTypeToViewModel()" для преобразования объектов типа "BookDBType" в объекты типа
 "BookViewModel".*/
 const books_service_1 = require("../../domain/books-service");
+/*Импортируем Mongoose модели.*/
+const schemas_1 = require("../../db/schemas/schemas");
 /*Создаем репозиторий "booksRepository" для работы с данными по книгам из Mongo БД.*/
 exports.booksRepository = {
     /*Создаем метод "findBooksByTitle()" для поиска книг по названию в Mongo БД.*/
@@ -29,15 +29,23 @@ exports.booksRepository = {
             1.3 параметр "title" не был указан - возвращается массив со всеми книгами в BLL.
             2. Если сервер Mongo БД не работает - возвращается ошибка в BLL.*/
             try {
+                // if (title) {
+                //     /*Метод "toArray()" создает новый экземпляр массива, заполненный элементами, полученными из
+                //     итератора.*/
+                //     foundBooks = await booksCollection.find({title: {$regex: title}}).toArray();
+                //     if (foundBooks.length === 0) return null;
+                // } else {
+                //     foundBooks = await booksCollection.find({}).toArray();
+                // }
+                /*Аналог через Mongoose.*/
                 if (title) {
-                    /*Метод "toArray()" создает новый экземпляр массива, заполненный элементами, полученными из
-                    итератора.*/
-                    foundBooks = yield db_mongo_1.booksCollection.find({ title: { $regex: title } }).toArray();
+                    /*"$options: 'i'" делает поиск регистронезависимым.*/
+                    foundBooks = yield schemas_1.BookModel.find({ title: { $regex: title, $options: 'i' } });
                     if (foundBooks.length === 0)
                         return null;
                 }
                 else {
-                    foundBooks = yield db_mongo_1.booksCollection.find({}).toArray();
+                    foundBooks = yield schemas_1.BookModel.find();
                 }
                 /*Возвращаем данные по найденным книгам по названию в BLL. Указано, что в ответе клиенту должен возвращаться
                 массив с объектами типа "BookViewModel", но TypeScript не ругается, если в ответе клиенту отправляется
@@ -61,7 +69,9 @@ exports.booksRepository = {
             1.2 книга не была найдена - возвращается null в BLL.
             2. Если сервер Mongo БД не работает - возвращается ошибка в BLL.*/
             try {
-                const foundBook = yield db_mongo_1.booksCollection.findOne({ id: +id });
+                // const foundBook: BookDBType | null = await booksCollection.findOne({id: +id});
+                /*Аналог через Mongoose.*/
+                const foundBook = yield schemas_1.BookModel.findOne({ id: +id });
                 if (!foundBook)
                     return null;
                 return (0, books_service_1.mapBookDBTypeToViewModel)(foundBook);
@@ -80,8 +90,11 @@ exports.booksRepository = {
             1.2 книга не была добавлена - возвращается false в BLL.
             2. Если сервер Mongo БД не работает - возвращается ошибка в BLL.*/
             try {
-                const result = yield db_mongo_1.booksCollection.insertOne(newBook);
-                return !!result.insertedId;
+                // const result = await booksCollection.insertOne(newBook);
+                // return !!result.insertedId;
+                /*Аналог через Mongoose.*/
+                const result = yield schemas_1.BookModel.create(newBook);
+                return !!result;
             }
             catch (error) {
                 throw error;
@@ -97,7 +110,10 @@ exports.booksRepository = {
             1.2 книга не была удалена - возвращается false в BLL.
             2. Если сервер Mongo БД не работает - возвращается ошибка в BLL.*/
             try {
-                const result = yield db_mongo_1.booksCollection.deleteOne({ id: +id });
+                // const result = await booksCollection.deleteOne({id: +id});
+                /*Аналог через Mongoose.*/
+                const result = yield schemas_1.BookModel.deleteOne({ id: +id });
+                console.log(result);
                 return !!result.deletedCount;
             }
             catch (error) {
@@ -114,8 +130,11 @@ exports.booksRepository = {
             1.2 книга не была обновлена - возвращается false в BLL.
             2. Если сервер Mongo БД не работает - возвращается ошибка в BLL.*/
             try {
-                yield db_mongo_1.booksCollection.updateOne({ id: +id }, { $set: { title: title } });
-                const updatedBook = yield db_mongo_1.booksCollection.findOne({ id: +id });
+                // await booksCollection.updateOne({id: +id}, {$set: {title: title}});
+                // const updatedBook: BookDBType | null = await booksCollection.findOne({id: +id});
+                /*Аналог через Mongoose.*/
+                yield schemas_1.BookModel.updateOne({ id: +id }, { $set: { title: title } });
+                const updatedBook = yield schemas_1.BookModel.findOne({ id: +id });
                 return !!updatedBook;
             }
             catch (error) {

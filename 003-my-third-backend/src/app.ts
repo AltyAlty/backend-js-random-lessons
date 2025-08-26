@@ -27,7 +27,7 @@ app.use(jsonBodyMiddleware);
 /*Подключаем middlewares. Порядок подключения middlewares важен.*/
 app.use(requestCounterMiddleware);
 app.use(uselessInfoMiddleware);
-// app.use(fakeAuthMiddleware);
+// app.use(fakeAuthorizationMiddleware);
 
 /*Подключаем роутеры. Здесь нужно указывать корневой путь адреса, к которому роутеры будут дописывать подпути в
 зависимости от их конфигурации.*/

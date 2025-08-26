@@ -23,7 +23,7 @@ exports.authService = {
             try {
                 /*Просим репозиторий "usersRepository" найти пользователя по логину или почте для проверки наличия
                 пользователя в БД и корректности указанного пароля при аутентификации.*/
-                const user = yield users_repository_db_mongo_1.usersRepository.findUserToCheckCredentialsByLoginOrEmail(loginOrEmail);
+                const user = yield users_repository_db_mongo_1.usersRepository.findUserByLoginOrEmailToCheckCredentials(loginOrEmail);
                 /*Если пользователь не был найден или почта пользователя еще не была подтверждена, то сообщаем UI о том, что
                 есть проблемы с учетными данными пользователя.*/
                 if (!user || !user.emailConfirmation.isConfirmed)
@@ -50,7 +50,7 @@ exports.authService = {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 /*Просим репозиторий "usersRepository" найти пользователя по почте для проверки наличия пользователя в БД.*/
-                const user = yield users_repository_db_mongo_1.usersRepository.findUserToCheckCredentialsByLoginOrEmail(email);
+                const user = yield users_repository_db_mongo_1.usersRepository.findUserByLoginOrEmailToCheckCredentials(email);
                 /*Если пользователь не был найден, почта пользователя уже была подтверждена, был указан неверный код для
                 подтверждения почты или код для подтверждения почты истек, то сообщаем UI об отказе в подтверждении почты
                 пользователя.*/

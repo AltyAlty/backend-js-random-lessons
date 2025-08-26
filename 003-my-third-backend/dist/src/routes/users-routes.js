@@ -67,6 +67,20 @@ const getUsersRouter = () => {
                 console.log(res.status);
                 if (res.status === 200) { return res.json().then(json => console.log(json)) } else { return }
             })
+
+        3. Почта была указана верно:
+        fetch('http://localhost:3000/users?email=a', {method: 'GET'})
+            .then(res => {
+                console.log(res.status);
+                if (res.status === 200) { return res.json().then(json => console.log(json)) } else { return }
+            })
+
+        4. Почта была указана неверно:
+        fetch('http://localhost:3000/users?email=x', {method: 'GET'})
+            .then(res => {
+                console.log(res.status);
+                if (res.status === 200) { return res.json().then(json => console.log(json)) } else { return }
+            })
         */
     }));
     /*Конфигурируем GET-запросы для получения данных по всем пользователям.*/
@@ -120,7 +134,7 @@ const getUsersRouter = () => {
         Для проверки в консоли можно использовать такие команды:
 
         1. ID был указан верно (бери ID из Mongo БД):
-        fetch('http://localhost:3000/users/68a109b63d81063b0444153a', {method: 'GET'})
+        fetch('http://localhost:3000/users/__id__', {method: 'GET'})
             .then(res => {
                 console.log(res.status);
                 if (res.status === 200) { return res.json().then(json => console.log(json)) } else { return }
@@ -167,11 +181,12 @@ const getUsersRouter = () => {
                 console.log(res.status);
                 if (res.status === 201) { return res.json().then(json => console.log(json)) } else { return }
             })
-
-        fetch('http://localhost:3000/users', {method: 'GET'})
-            .then(res => {
-                console.log(res.status);
-                if (res.status === 200) { return res.json().then(json => console.log(json)) } else { return }
+            .then(() => {
+                fetch('http://localhost:3000/users', {method: 'GET'})
+                    .then(res => {
+                        console.log(res.status);
+                        if (res.status === 200) { return res.json().then(json => console.log(json)) } else { return }
+                    })
             })
 
         2. Логин не был указан, а почта (ненастоящая, не использовать nodemailer) и пароль были указаны.
@@ -207,6 +222,13 @@ const getUsersRouter = () => {
             .then(res => {
                 console.log(res.status);
                 if (res.status === 201) { return res.json().then(json => console.log(json)) } else { return }
+            })
+            .then(() => {
+                fetch('http://localhost:3000/users', {method: 'GET'})
+                    .then(res => {
+                        console.log(res.status);
+                        if (res.status === 200) { return res.json().then(json => console.log(json)) } else { return }
+                    })
             })
         */
     }));

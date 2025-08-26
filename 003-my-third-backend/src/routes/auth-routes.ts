@@ -102,6 +102,13 @@ export const getAuthRouter = () => {
                 console.log(res.status);
                 if (res.status === 201) { return res.json().then(json => console.log(json)) } else { return }
             })
+            .then(() => {
+                fetch('http://localhost:3000/users', {method: 'GET'})
+                    .then(res => {
+                        console.log(res.status);
+                        if (res.status === 200) { return res.json().then(json => console.log(json)) } else { return }
+                    })
+            })
 
         1.2 Подтверждение почты пользователя (код смотри в Mongo БД и в почте):
         fetch('http://localhost:3000/auth/confirm-email', {

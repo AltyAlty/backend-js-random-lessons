@@ -208,6 +208,12 @@ const getBooksRouter = () => {
         fetch('http://localhost:3000/books/222', {method: 'DELETE'})
             .then(res => console.log(res.status))
 
+        fetch('http://localhost:3000/books', {method: 'GET'})
+            .then(res => {
+                console.log(res.status);
+                if (res.status === 200) { return res.json().then(json => console.log(json)) } else { return }
+            })
+
         3. ID не был указан:
         fetch('http://localhost:3000/books', {method: 'DELETE'})
             .then(res => console.log(res.status))

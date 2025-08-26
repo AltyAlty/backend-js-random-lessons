@@ -4,8 +4,8 @@ import express, {Request, Response} from 'express';
 import {mainPageService} from '../domain/main-page-service';
 /*Импортируем HTTP-статусы.*/
 import {HTTP_STATUSES} from '../utils/utils';
-/*Импортируем для типизации.*/
-import {Document, WithId} from 'mongodb';
+/*Импортируем типы.*/
+import {mainPageContentDBType} from '../db/types/db-types';
 
 /*Создаем функцию "getMainPageRouter()" для создания роутинга по адресу http://localhost:3000.*/
 export const getMainPageRouter = () => {
@@ -13,7 +13,7 @@ export const getMainPageRouter = () => {
     const router = express.Router();
 
     /*Конфигурируем GET-запросы по адресу http://localhost:3000.*/
-    router.get('/', async (req: Request, res: Response): Promise<void> => {
+    router.get('/', async (req: Request, res: Response<mainPageContentDBType | string>): Promise<void> => {
         /*Метод "send()" - это аналог метода "write()" из библиотеки "http". Этот метод в зависимости от передаваемых
         данных сам меняет заголовок "Content-Type" в ответе. Если передать число, то оно будет интерпретировано как код
         ответа от сервера. Передаем объект, чтобы можно было работать с форматом JSON.*/
@@ -37,7 +37,7 @@ export const getMainPageRouter = () => {
         найдено.
         2. Если сервер Mongo БД не работает - сообщается клиенту об ошибке при работе с сервером Mongo БД.*/
         try {
-            const mainPageContent: WithId<Document> | string | null = await mainPageService.getMainPageContent();
+            const mainPageContent: mainPageContentDBType | null = await mainPageService.getMainPageContent();
 
             if (!mainPageContent) {
                 res.status(HTTP_STATUSES.OK_200).send('No main page content found');

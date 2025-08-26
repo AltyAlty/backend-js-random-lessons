@@ -1,14 +1,14 @@
 /*Импортируем репозитории.*/
 import {mainPageRepository} from '../repositories/mongo/main-page-repository-db-mongo';
 // import {mainPageRepository} from '../repositories/local/main-page-repository-db-local';
-/*Импортируем для типизации.*/
-import {Document, WithId} from 'mongodb';
+/*Импортируем типы.*/
+import {mainPageContentDBType} from '../db/types/db-types';
 
 /*Создаем сервис "mainPageService" для работы с данными для главной страницы.*/
 export const mainPageService = {
     /*Создаем метод "getMainPageContent()" для поиска данных для главной страницы. Используем "async", чтобы то, что
     возвращается функцией, оборачивалось в промис.*/
-    async getMainPageContent(): Promise<WithId<Document> | string | null > {
+    async getMainPageContent(): Promise<mainPageContentDBType | null > {
         /*Просим репозиторий "mainPageRepository" найти данные для главной страницы. Порядок работы такой:
         1. Если сервер Mongo БД работает и:
         1.1 данные для главной страницы были найдены - возвращаются данные для главной страница в UI.

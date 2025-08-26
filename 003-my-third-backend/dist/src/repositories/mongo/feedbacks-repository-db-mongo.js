@@ -10,11 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.feedbacksRepository = void 0;
-/*Импортируем коллекции из Mongo БД.*/
-const db_mongo_1 = require("../../db/db-mongo");
 /*Импортируем функцию "mapFeedbackDBTypeToFeedbackViewModel()" для преобразования объектов типа "FeedbackDBType" в
 объекты типа "FeedbackViewModel".*/
 const feedbacks_service_1 = require("../../domain/feedbacks-service");
+/*Импортируем Mongoose модели.*/
+const schemas_1 = require("../../db/schemas/schemas");
+/*Импортируем Types из Mongoose, чтобы использовать конструкторы типов данных, которые понимает Mongoose, для
+преобразования объектов типа ObjectId из MongoDB в объекты, понятные Mongoose.*/
+const mongoose_1 = require("mongoose");
 /*Создаем репозиторий "feedbacksRepository" для работы с отзывами из Mongo БД.*/
 exports.feedbacksRepository = {
     /*Создаем метод "findAllFeedbacks()" для поиска всех отзывов в Mongo БД.*/
@@ -26,7 +29,9 @@ exports.feedbacksRepository = {
             1.2 отзывы не были найдены - возвращается пустой массив в BLL.
             2. Если сервер Mongo БД не работает - возвращается ошибка в BLL.*/
             try {
-                const foundFeedbacks = yield db_mongo_1.feedbacksCollection.find().sort('createdAt', -1).toArray();
+                // const foundFeedbacks = await feedbacksCollection.find().sort('createdAt', -1).toArray();
+                /*Аналог через Mongoose.*/
+                const foundFeedbacks = yield schemas_1.FeedbackModel.find().sort('createdAt').lean();
                 return foundFeedbacks.map(feedbacks_service_1.mapFeedbackDBTypeToFeedbackViewModel);
             }
             catch (error) {
@@ -43,8 +48,12 @@ exports.feedbacksRepository = {
             1.2 отзыв не был добавлен - возвращается false в BLL.
             2. Если сервер Mongo БД не работает - возвращается ошибка в BLL.*/
             try {
-                const result = yield db_mongo_1.feedbacksCollection.insertOne(newFeedback);
-                return !!result.insertedId;
+                // const result = await feedbacksCollection.insertOne(newFeedback);
+                // return !!result.insertedId;
+                /*Аналог через Mongoose.*/
+                const mongooseNewFeedback = Object.assign(Object.assign({}, newFeedback), { _id: new mongoose_1.Types.ObjectId(newFeedback._id), userID: new mongoose_1.Types.ObjectId(newFeedback.userID) });
+                const result = yield schemas_1.FeedbackModel.create(mongooseNewFeedback);
+                return !!result;
             }
             catch (error) {
                 throw error;

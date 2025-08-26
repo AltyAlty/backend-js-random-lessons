@@ -104,10 +104,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.feedbacksCollection = exports.usersCollection = exports.booksCollection = exports.mainPageContentCollection = exports.connectDB = void 0;
 /*Импортируем MongoClient из MongoDB для создания клиента для MongoDB.*/
 const mongodb_1 = require("mongodb");
+/*Импортируем mongoose из Mongoose для работы с MongoDB через Mongoose.*/
+const mongoose_1 = __importDefault(require("mongoose"));
 /*Делаем так, чтобы URI определялся автоматически от окружения.*/
 const mongoURI = process.env.mongoURI || 'mongodb://0.0.0.0:27017';
 /*Создаем клиента для MongoDB.*/
@@ -116,21 +121,23 @@ const client = new mongodb_1.MongoClient(mongoURI);
 function connectDB() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            /*Пытаемся присоединить клиента для MongoDB к серверу, где развернута Mongo БД.*/
-            yield client.connect();
-            /*Проверяем соединение.*/
-            yield client.db('bookshop').command({ ping: 1 });
+            /*Присоединяем клиента для MongoDB к серверу, где развернута Mongo БД, и проверяем соединение.*/
+            // await client.connect();
+            // await client.db('bookshop').command({ping: 1});
+            /*Аналог через Mongoose.*/
+            yield mongoose_1.default.connect(mongoURI + '/' + 'bookshop');
             console.log('Successfully connected to the Mongo server');
         }
         catch (_a) {
             console.log('Cannot connect to the Mongo server');
             /*Закрываем соединение в случае неудачной попытки подключения к серверу, где развернута Mongo БД.*/
-            yield client.close();
+            // await client.close();
+            /*Аналог через Mongoose.*/
+            yield mongoose_1.default.disconnect();
         }
     });
 }
 exports.connectDB = connectDB;
-;
 /*Выбираем БД "bookshop" из Mongo БД.*/
 const remoteDB = client.db('bookshop');
 /*Получаем коллекции из БД "bookshop". У этих коллекций будут методы, копирующие функционал команд из MongoDB.*/
