@@ -1,15 +1,3 @@
-/*
-Установка: установить Node.js
-
-Запуск приложения: node server3.js
-
-Это HTTP-сервер, который прослушивает протокол HTTP на порту 3003 (lesson 006).
-
-Проверка приложения:
-Перейти на http://localhost:3003/
-Перейти на http://localhost:3003/home
-*/
-
 const http = require('http');
 
 const server = http.createServer(
